@@ -92,7 +92,7 @@ const Admin = () => {
       },
     },
     {
-      field: "block",
+      field: "country",
       headerName: "Block",
       flex: 0.4,
       editable: true,
@@ -133,25 +133,25 @@ const Admin = () => {
         );
       },
     },
-    {
-      field: 'edit',
-      headerName: 'Edit',
-      sortable: false,
-      width: 120,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        const handleEdit = (event) => {
-          event.stopPropagation();
-          setOpenView(true)
-        };
+    // {
+    //   field: 'edit',
+    //   headerName: 'Edit',
+    //   sortable: false,
+    //   width: 120,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     const handleEdit = (event) => {
+    //       event.stopPropagation();
+    //       setOpenView(true)
+    //     };
 
-        return (
-          <IconButton variant="text" color="secondary" onClick={handleEdit}>
-            <Edit />
-          </IconButton>
-        );
-      },
-    },
+    //     return (
+    //       <IconButton variant="text" color="secondary" onClick={handleEdit}>
+    //         <Edit />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
     {
       field: 'delete',
       headerName: 'Delete',
