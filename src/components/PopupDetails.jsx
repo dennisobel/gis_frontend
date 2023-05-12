@@ -58,8 +58,8 @@ function PopupDetails({ selectedMarker }) {
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <DirectionsIcon sx={{ fontSize: 32, marginRight: 16 }} />
-                    <ContactMailIcon sx={{ fontSize: 32 }} />
+                    <DirectionsIcon sx={{ fontSize: 32, marginRight: 16, cursor: 'pointer' }} />
+                    <ContactMailIcon sx={{ fontSize: 32, cursor: 'pointer' }} />
                 </div>
             </div>
         </div>
