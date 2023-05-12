@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Map, { Marker, Popup, NavigationControl, Source, Layer } from 'react-map-gl';
+import Map, { Marker, Popup, NavigationControl, Source, Layer} from 'react-map-gl';
 import { interpolateOranges, interpolateGreens, interpolateReds, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { useSelector } from 'react-redux';
 import Dot from './Dot';
