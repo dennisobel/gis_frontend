@@ -1,0 +1,163 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  width: 100%;
+  font-family: "Inter", sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffe3a3;
+}
+
+.mapboxgl-popup-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #008080;
+  bottom: -10px;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-content,
+.mapboxgl-popup-anchor-top .mapboxgl-popup-content {
+  padding-bottom: 10px;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-content {
+  margin-bottom: 0;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  top: -10px;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-content {
+  margin-top: 0;
+}
+
+.mapboxgl-popup {
+  z-index: 9999;
+}
+
+.mapboxgl-canvas .mapboxgl-interactive {
+  cursor: pointer;
+}
+
+
+.mapboxgl-popup {
+  max-width: 300px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.mapboxgl-popup-content {
+  padding: 10px;
+}
+
+.mapboxgl-popup-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ffffff;
+}
+
+.navigation-control {
+  position: absolute;
+  top: 120px;
+  right: 120px;
+  z-index: 100;
+}
+
+/* Define the animation */
+@keyframes shimmer {
+  0% {
+    background-position: -100px 0;
+  }
+  100% {
+    background-position: 100px 0;
+  }
+}
+
+/* Apply the animation to the icon */
+.icon {
+  /* background: linear-gradient(to right, #0d1025 30%, #21295c 50%, #141937 70%); */
+  background-size: 700px 100%;
+  animation: shimmer 10s infinite;
+}
+
+/* Define the animation */
+@keyframes blink {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Apply the animation to the label */
+.label {
+  animation: blink 5s ease-in-out infinite;
+}
+
+
+.userform {
+  width: 90%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  text-align: center;
+  float: center;
+  padding: 20px;
+  background: linear-gradient(10deg, #fdfdfd 100%, #9dfccb 00%);
+  color: #fff;
+  border: 2px solid rgb(164, 72, 255);
+  border-radius: 10px;
+  box-shadow: 8px 8px rgb(241, 131, 131);
+}
+
+.nextMenu {
+  margin: 20px;
+  cursor: pointer;
+  color: rgb(0, 188, 212);
+}
+
+.nextMenu:hover {
+  margin: 20px;
+  cursor: pointer;
+  color: white;
+  background-color: rgb(0, 188, 212);
+}
+
+.success{
+  color: green;
+  margin: 30px;
+}
