@@ -3,16 +3,15 @@ import {
   TextField,
   Card,
   Button,
-  FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from "@mui/material";
 import validator from "validator";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsAuthenticated } from "state";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setLogin } from "state";
+import { verifyPassword } from '../../helper/helper'
 
 const LoginForm = () => {
   const dispatch = useDispatch()
@@ -31,6 +30,9 @@ const LoginForm = () => {
 
   const options = [
     { value: "management", label: "County Management" },
+    { value: "governor", label: "Governor" },
+    { value: "cec", label: "CEC" },
+    { value: "director", label: "Director" },
     { value: "revenueOfficer", label: "Revenue Officer" },
   ];
 
@@ -54,8 +56,15 @@ const LoginForm = () => {
     if (!Object.values(errors).some(Boolean)) {
       console.log("Form submitted successfully:", formValues);
       // dispatch(setIsAuthenticated())
-      dispatch(setLogin(formValues))
-      navigate("/dashboard")
+      // axios.post("https://gis.affordit.co.ke/login", formValues)
+      // .then(res => console.log("LOGIN:",res))
+      let loginPromise = verifyPassword(formValues)
+      loginPromise.then(res => {
+        let { token } = res.data;
+        localStorage.setItem('token', token);
+        // dispatch(setLogin(formValues))
+        navigate('/otp')
+      })
     }
   };
 
@@ -90,7 +99,7 @@ const LoginForm = () => {
         />
 
         <InputLabel id="select-label">Select a Role</InputLabel>
-        <Select
+        {/* <Select
           size="small"
           name="role"
           required
@@ -104,7 +113,7 @@ const LoginForm = () => {
               {option.label}
             </MenuItem>
           ))}
-        </Select>
+        </Select> */}
         <p style={{ textAlign: "center", marginTop: "1rem" }}>
           You don't have an account? <a href="/">Sign Up</a>
         </p>

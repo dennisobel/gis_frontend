@@ -19,6 +19,8 @@ import Performance from "scenes/performance";
 import Signup from "./scenes/signup";
 import OTPForm from "scenes/otp";
 import LoginForm from "scenes/login";
+import { AuthorizeUser, ProtectRoute } from './middleware/auth'
+
 
 function App() {
   const mode = useSelector((state) => state.global.mode);

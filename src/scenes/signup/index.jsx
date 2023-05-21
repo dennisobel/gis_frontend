@@ -12,34 +12,56 @@ import validator from "validator";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSignup } from "state"
-// import state from "state";
+import axios from "axios";
+import { useEffect } from "react";
+import { registerUser } from '../../helper/helper'
 
 const SignUpForm = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // axios.get("https://gis.affordit.co.ke/roles")
+    //   .then(res => {
+    //     console.log("roles", res)
+    //   })
+  }, [])
+
 
   const [formValues, setFormValues] = useState({
     name: "",
-    phoneNumber: "",
+    msisdn: "",
     email: "",
-    workId: "",
+    id_number: "",
     password: "",
-    role: "",
+    role_id: "",
+    user_type: "",
+    kra_brs_number: ""
   });
 
   const [formErrors, setFormErrors] = useState({
     name: false,
-    phoneNumber: false,
+    msisdn: false,
     email: false,
-    workId: false,
+    id_number: false,
     password: false,
-    role: false,
+    role_id: false,
+    user_type: false,
+    kra_brs_number: false
   });
 
   const options = [
     { value: "management", label: "County Management" },
+    { value: "governor", label: "Governor" },
+    { value: "cec", label: "CEC" },
+    { value: "director", label: "Director" },
     { value: "revenueOfficer", label: "Revenue Officer" },
   ];
+
+  const userType = [
+    { value: "resident", label: "Resident" },
+    { value: "non-resident", label: "Non Resident" },
+  ]
 
   const handleChange = (e) => {
     setFormValues({
@@ -53,19 +75,25 @@ const SignUpForm = () => {
 
     const errors = {
       name: validator.isEmpty(formValues.name),
-      phoneNumber: !validator.isMobilePhone(formValues.phoneNumber),
+      msisdn: !validator.isMobilePhone(formValues.msisdn),
       email: !validator.isEmail(formValues.email),
-      workId: !validator.isNumeric(formValues.workId),
+      id_number: !validator.isNumeric(formValues.id_number),
       password: validator.isEmpty(formValues.password),
-      role: validator.isEmpty(formValues.role),
+      role_id: validator.isEmpty(formValues.role_id),
     };
 
     setFormErrors(errors);
 
     if (!Object.values(errors).some(Boolean)) {
+      // axios.post("http://localhost:5001/auth/register", formValues)
+      // .then(res => {
+      //   console.log("CREATE USER:",res)
+      // })
+      let registerPromise = registerUser(formValues)
       dispatch(setSignup(formValues))
+      registerPromise.then(function(){ navigate('/login')});
       console.log("Form submitted successfully:", formValues);
-      navigate("/otp");
+      // navigate("/otp");
     }
   };
 
@@ -90,12 +118,12 @@ const SignUpForm = () => {
           required
           fullWidth
           margin="normal"
-          name="phoneNumber"
-          value={formValues.phoneNumber}
+          name="msisdn"
+          value={formValues.msisdn}
           onChange={handleChange}
-          error={formErrors.phoneNumber}
+          error={formErrors.msisdn}
           helperText={
-            formErrors.phoneNumber && "Please enter a valid phone number"
+            formErrors.msisdn && "Please enter a valid phone number"
           }
         />
         <InputLabel id="select-label">Work Email</InputLabel>
@@ -111,19 +139,48 @@ const SignUpForm = () => {
           error={formErrors.email}
           helperText={formErrors.email && "Please enter a valid email address"}
         />
-        <InputLabel id="select-label">Work ID</InputLabel>
+        <InputLabel id="select-label">ID Number</InputLabel>
         <TextField
           size="small"
           required
           fullWidth
           margin="normal"
-          name="workId"
+          name="id_number"
           type="text"
-          value={formValues.workId}
+          value={formValues.id_number}
           onChange={handleChange}
-          error={formErrors.workId}
-          helperText={formErrors.workId && "Please enter a valid ID number"}
+          error={formErrors.id_number}
+          helperText={formErrors.id_number && "Please enter a valid ID number"}
         />
+        <InputLabel id="select-label">KRA Number</InputLabel>
+        <TextField
+          size="small"
+          required
+          fullWidth
+          margin="normal"
+          name="kra_brs_number"
+          type="text"
+          value={formValues.kra_brs_number}
+          onChange={handleChange}
+          error={formErrors.kra_brs_number}
+          helperText={formErrors.kra_brs_number && "Please enter a valid KRA number"}
+        />
+        <InputLabel id="select-label">Are you a resident</InputLabel>
+        <Select
+          size="small"
+          name="user_type"
+          required
+          fullWidth
+          margin="normal"
+          value={formValues.user_type}
+          onChange={handleChange}
+        >
+          {userType.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
         <InputLabel id="select-label">Password</InputLabel>
         <TextField
           size="small"
@@ -141,11 +198,11 @@ const SignUpForm = () => {
         <InputLabel id="select-label">Select a Role</InputLabel>
         <Select
           size="small"
-          name="role"
+          name="role_id"
           required
           fullWidth
           margin="normal"
-          value={formValues.role}
+          value={formValues.role_id}
           onChange={handleChange}
         >
           {options.map((option) => (

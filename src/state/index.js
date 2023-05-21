@@ -15,9 +15,6 @@ const initialState = {
     role: "",
   },
   login: {
-    email: "",
-    password: "",
-    role: ""
   },
   otp: {
     otp: "",

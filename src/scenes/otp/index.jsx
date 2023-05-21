@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Card,
@@ -12,80 +12,118 @@ import validator from "validator";
 import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setIsAuthenticated, setOtp } from "state";
+import { setLogin, setOtp } from "state";
+import { generateOTP, verifyOTP, getUsername } from '../../helper/helper';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OTPForm = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [formValues, setFormValues] = useState({
-    otp: "",
+    code: "",
   });
+  const [user, setUser] = useState()
+
+  useEffect(() => {
+    getUser()
+  },[])
+
+  const getUser = () => {
+    let user;
+    getUsername().then(res => {
+      dispatch(setLogin(res))
+      setUser(res)
+      // user = res;
+      const email = res?.email
+      if (email) {
+        generateOTP(email).then((OTP) => {
+          console.log(OTP)
+          if (OTP) toast.success('OTP has been send to your email!');
+          toast.error('Problem while generating OTP!')
+        })
+      } else {
+        console.log("email not found")
+      }
+    })
+  }
 
   const [formErrors, setFormErrors] = useState({
-    otp: false,
+    code: false,
   });
 
   const handleChange = (e) => {
+    e.preventDefault();
     setFormValues({
       ...formValues,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const errors = {
-      otp: validator.isEmpty(formValues.otp),
+      code: validator.isEmpty(formValues.code),
     };
 
     setFormErrors(errors);
 
     if (!Object.values(errors).some(Boolean)) {
-      console.log("Form submitted successfully:", formValues);
-      dispatch(setOtp(formValues))
+      console.log("Form submitted successfully:", formValues, user);
+      let { status } = await verifyOTP({ email: user.email, code: formValues.code  })
+      if(status === 201){
+        toast.success('Verify Successfully!')
+        // dispatch(setOtp(formValues))
+        // dispatch(setLogin(formValues))
+        return navigate('/dashboard')
+      }  
+      // dispatch(setOtp(formValues))
       // dispatch(setIsAuthenticated())
-      navigate("/dashboard")
+      // navigate("/dashboard")
     }
   };
 
   return (
-    <Card sx={{ maxWidth: 500, margin: "0 auto", mt: 5, p: 3 }}>
-      <form onSubmit={handleSubmit}>
-      <TextField
-          required
-          fullWidth
-          margin="normal"
-          label="OTP"
-          name="otp"
-          value={formValues.otp}
-          onChange={handleChange}
-          error={formErrors.otp}
-          helperText={formErrors.otp && "Please enter your otp"}
-        />
+    <>
+      <ToastContainer />
+      <Card sx={{ maxWidth: 500, margin: "0 auto", mt: 5, p: 3 }}>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            required
+            fullWidth
+            margin="normal"
+            label="OTP"
+            name="code"
+            value={formValues.code}
+            onChange={handleChange}
+            error={formErrors.code}
+            helperText={formErrors.code && "Please enter your otp"}
+          />
 
-        <Button
-          variant="contained"
-          type="submit"
-          sx={{
-            marginTop: 4,
-            paddingX: 4,
-            paddingY: 2,
-            borderRadius: 2,
-            boxShadow: "none",
-            backgroundColor: "teal",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#0039cb",
+          <Button
+            variant="contained"
+            type="submit"
+            sx={{
+              marginTop: 4,
+              paddingX: 4,
+              paddingY: 2,
+              borderRadius: 2,
               boxShadow: "none",
-            },
-          }}
-        >
-          Submit OTP
-        </Button>
+              backgroundColor: "teal",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#0039cb",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Submit OTP
+          </Button>
 
-      </form>
-    </Card>
+        </form>
+      </Card>
+    </>
   )
 }
 

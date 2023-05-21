@@ -117,15 +117,135 @@ const Sidebar = ({
   }, [pathname]);
 
   useEffect(() => {
-    console.log("LOGIN:", login)
-    login.role === "management" ? setNav([
+    switch (login.role) {
+      case "governor":
+        setNav([
+          {
+            text: "Dashboard",
+            icon: <HomeOutlined />,
+          }, {
+            text: "Client Facing",
+            icon: null,
+          },
+          {
+            text: "Geography",
+            icon: <PublicOutlined />,
+          }, {
+            text: "Revenue",
+            icon: null,
+          },
+          {
+            text: "Overview",
+            icon: <PointOfSaleOutlined />,
+          },
+          {
+            text: "Daily",
+            icon: <TodayOutlined />,
+          },
+          {
+            text: "Monthly",
+            icon: <CalendarMonthOutlined />,
+          },
+          {
+            text: "Breakdown",
+            icon: <PieChartOutlined />,
+          }
+        ]);
+        break;
+      case "cec":
+        setNav([
+          {
+            text: "Dashboard",
+            icon: <HomeOutlined />,
+          }, {
+            text: "Client Facing",
+            icon: null,
+          },
+          {
+            text: "Geography",
+            icon: <PublicOutlined />,
+          }, {
+            text: "Revenue",
+            icon: null,
+          },
+          {
+            text: "Overview",
+            icon: <PointOfSaleOutlined />,
+          },
+          {
+            text: "Daily",
+            icon: <TodayOutlined />,
+          },
+          {
+            text: "Monthly",
+            icon: <CalendarMonthOutlined />,
+          },
+          {
+            text: "Breakdown",
+            icon: <PieChartOutlined />,
+          }
+        ]);
+        break;
+      case "director":
+        setNav([
+          {
+            text: "Dashboard",
+            icon: <HomeOutlined />,
+          }, {
+            text: "Client Facing",
+            icon: null,
+          }, {
+            text: "Businesses",
+            icon: <Groups2Outlined />,
+          },
+          {
+            text: "Transactions",
+            icon: <ReceiptLongOutlined />,
+          },
+          {
+            text: "Geography",
+            icon: <PublicOutlined />,
+          }, {
+            text: "Revenue",
+            icon: null,
+          },
+          {
+            text: "Overview",
+            icon: <PointOfSaleOutlined />,
+          },
+          {
+            text: "Daily",
+            icon: <TodayOutlined />,
+          },
+          {
+            text: "Monthly",
+            icon: <CalendarMonthOutlined />,
+          },
+          {
+            text: "Breakdown",
+            icon: <PieChartOutlined />,
+          },
+          {
+            text: "Management",
+            icon: null,
+          },
+          {
+            text: "Admin",
+            icon: <AdminPanelSettingsOutlined />,
+          },
+          {
+            text: "Performance",
+            icon: <TrendingUpOutlined />,
+          },
+        ]);
+        break;
+      case "revenueOfficer":
+        setNav([
       {
         text: "Dashboard",
         icon: <HomeOutlined />,
-      }, {
-        text: "Client Facing",
-        icon: null,
-      }, {
+      },
+      {
         text: "Businesses",
         icon: <Groups2Outlined />,
       },
@@ -136,7 +256,8 @@ const Sidebar = ({
       {
         text: "Geography",
         icon: <PublicOutlined />,
-      }, {
+      },
+      {
         text: "Revenue",
         icon: null,
       },
@@ -153,59 +274,103 @@ const Sidebar = ({
         icon: <CalendarMonthOutlined />,
       },
       {
-        text: "Breakdown",
-        icon: <PieChartOutlined />,
-      },
-      {
-        text: "Management",
-        icon: null,
-      },
-      {
-        text: "Admin",
-        icon: <AdminPanelSettingsOutlined />,
-      },
-      {
         text: "Performance",
         icon: <TrendingUpOutlined />,
       },
-    ]) : setNav([
-      {
-        text: "Dashboard",
-        icon: <HomeOutlined />,
-      },
-      {
-        text: "Businesses",
-        icon: <Groups2Outlined />,
-      },
-      {
-        text: "Transactions",
-        icon: <ReceiptLongOutlined />,
-      },
-      {
-        text: "Geography",
-        icon: <PublicOutlined />,
-      },
-      {
-        text: "Revenue",
-        icon: null,
-      },
-      {
-        text: "Overview",
-        icon: <PointOfSaleOutlined />,
-      },
-      {
-        text: "Daily",
-        icon: <TodayOutlined />,
-      },
-      {
-        text: "Monthly",
-        icon: <CalendarMonthOutlined />,
-      },
-      {
-        text: "Performance",
-        icon: <TrendingUpOutlined />,
-      },
-    ])
+    ]);
+        break;
+      default:
+        setNav([])
+        break;
+    }
+    // login.role === "management" ? setNav([
+    //   {
+    //     text: "Dashboard",
+    //     icon: <HomeOutlined />,
+    //   }, {
+    //     text: "Client Facing",
+    //     icon: null,
+    //   }, {
+    //     text: "Businesses",
+    //     icon: <Groups2Outlined />,
+    //   },
+    //   {
+    //     text: "Transactions",
+    //     icon: <ReceiptLongOutlined />,
+    //   },
+    //   {
+    //     text: "Geography",
+    //     icon: <PublicOutlined />,
+    //   }, {
+    //     text: "Revenue",
+    //     icon: null,
+    //   },
+    //   {
+    //     text: "Overview",
+    //     icon: <PointOfSaleOutlined />,
+    //   },
+    //   {
+    //     text: "Daily",
+    //     icon: <TodayOutlined />,
+    //   },
+    //   {
+    //     text: "Monthly",
+    //     icon: <CalendarMonthOutlined />,
+    //   },
+    //   {
+    //     text: "Breakdown",
+    //     icon: <PieChartOutlined />,
+    //   },
+    //   {
+    //     text: "Management",
+    //     icon: null,
+    //   },
+    //   {
+    //     text: "Admin",
+    //     icon: <AdminPanelSettingsOutlined />,
+    //   },
+    //   {
+    //     text: "Performance",
+    //     icon: <TrendingUpOutlined />,
+    //   },
+    // ]) : setNav([
+    //   {
+    //     text: "Dashboard",
+    //     icon: <HomeOutlined />,
+    //   },
+    //   {
+    //     text: "Businesses",
+    //     icon: <Groups2Outlined />,
+    //   },
+    //   {
+    //     text: "Transactions",
+    //     icon: <ReceiptLongOutlined />,
+    //   },
+    //   {
+    //     text: "Geography",
+    //     icon: <PublicOutlined />,
+    //   },
+    //   {
+    //     text: "Revenue",
+    //     icon: null,
+    //   },
+    //   {
+    //     text: "Overview",
+    //     icon: <PointOfSaleOutlined />,
+    //   },
+    //   {
+    //     text: "Daily",
+    //     icon: <TodayOutlined />,
+    //   },
+    //   {
+    //     text: "Monthly",
+    //     icon: <CalendarMonthOutlined />,
+    //   },
+    //   {
+    //     text: "Performance",
+    //     icon: <TrendingUpOutlined />,
+    //   },
+    // ])
   }, [login])
 
   return (
