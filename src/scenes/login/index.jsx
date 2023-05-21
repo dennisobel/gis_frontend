@@ -55,9 +55,6 @@ const LoginForm = () => {
 
     if (!Object.values(errors).some(Boolean)) {
       console.log("Form submitted successfully:", formValues);
-      // dispatch(setIsAuthenticated())
-      // axios.post("https://gis.affordit.co.ke/login", formValues)
-      // .then(res => console.log("LOGIN:",res))
       let loginPromise = verifyPassword(formValues)
       loginPromise.then(res => {
         let { token } = res.data;

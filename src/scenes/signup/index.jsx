@@ -12,21 +12,11 @@ import validator from "validator";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSignup } from "state"
-import axios from "axios";
-import { useEffect } from "react";
 import { registerUser } from '../../helper/helper'
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    // axios.get("https://gis.affordit.co.ke/roles")
-    //   .then(res => {
-    //     console.log("roles", res)
-    //   })
-  }, [])
-
 
   const [formValues, setFormValues] = useState({
     name: "",
@@ -36,7 +26,8 @@ const SignUpForm = () => {
     password: "",
     role_id: "",
     user_type: "",
-    kra_brs_number: ""
+    kra_brs_number: "",
+    ministry: ""
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -47,7 +38,8 @@ const SignUpForm = () => {
     password: false,
     role_id: false,
     user_type: false,
-    kra_brs_number: false
+    kra_brs_number: false,
+    ministry: false
   });
 
   const options = [
@@ -91,7 +83,7 @@ const SignUpForm = () => {
       // })
       let registerPromise = registerUser(formValues)
       dispatch(setSignup(formValues))
-      registerPromise.then(function(){ navigate('/login')});
+      registerPromise.then(function () { navigate('/login') });
       console.log("Form submitted successfully:", formValues);
       // navigate("/otp");
     }
@@ -211,6 +203,24 @@ const SignUpForm = () => {
             </MenuItem>
           ))}
         </Select>
+
+        {
+          formValues.role_id === "cec" || formValues.role_id === "director" ? <>
+            <InputLabel id="select-label">Which Ministry do you work for</InputLabel>
+            <TextField
+              size="small"
+              required
+              fullWidth
+              margin="normal"
+              name="ministry"
+              type="text"
+              value={formValues.ministry}
+              onChange={handleChange}
+              error={formErrors.ministry}
+              helperText={formErrors.ministry && "Please enter a valid Ministry"}
+            />
+          </> : <></>
+        }
         <p style={{ textAlign: "center", marginTop: "1rem" }}>
           Already have an account? <a href="/login">Log in</a>
         </p>
