@@ -1,6 +1,14 @@
 import React from 'react'
 import DirectionsIcon from '@mui/icons-material/Directions';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
+import {
+    TextField,
+    Card,
+    Button,
+    InputLabel,
+    Select,
+    MenuItem,
+} from "@mui/material";
 
 
 
@@ -57,10 +65,23 @@ function PopupDetails({ selectedMarker }) {
                     </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center" }}>
+                <Card sx={{ maxWidth: 500, margin: "0 auto", mt: 5, p: 3 }}>
+                    <InputLabel id="select-label">Message</InputLabel>
+                    <TextField
+                        size="small"
+                        required
+                        fullWidth
+                        margin="normal"
+                        name="text"
+                        type="text"
+                    /> <br/>
+                    <ContactMailIcon sx={{ fontSize: 34, cursor: 'pointer' }} />
+                </Card>
+
+                {/* <div style={{ display: "flex", alignItems: "center" }}>
                     <DirectionsIcon sx={{ fontSize: 32, marginRight: 16, cursor: 'pointer' }} />
                     <ContactMailIcon sx={{ fontSize: 32, cursor: 'pointer' }} />
-                </div>
+                </div> */}
             </div>
         </div>
     )

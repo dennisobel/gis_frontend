@@ -12,7 +12,9 @@ import validator from "validator";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSignup } from "state"
+import counties from "state/counties";
 import { registerUser } from '../../helper/helper'
+import axios from "axios";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -24,10 +26,11 @@ const SignUpForm = () => {
     email: "",
     id_number: "",
     password: "",
-    role_id: "",
+    role: "",
     user_type: "",
     kra_brs_number: "",
-    ministry: ""
+    ministry: "",
+    county_id: ""
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -36,10 +39,11 @@ const SignUpForm = () => {
     email: false,
     id_number: false,
     password: false,
-    role_id: false,
+    role: false,
     user_type: false,
     kra_brs_number: false,
-    ministry: false
+    ministry: false,
+    county_id: false
   });
 
   const options = [
@@ -71,21 +75,22 @@ const SignUpForm = () => {
       email: !validator.isEmail(formValues.email),
       id_number: !validator.isNumeric(formValues.id_number),
       password: validator.isEmpty(formValues.password),
-      role_id: validator.isEmpty(formValues.role_id),
+      role: validator.isEmpty(formValues.role),
     };
 
     setFormErrors(errors);
 
     if (!Object.values(errors).some(Boolean)) {
-      // axios.post("http://localhost:5001/auth/register", formValues)
+      // axios.post("https://gis.affordit.co.ke/users", formValues)
       // .then(res => {
       //   console.log("CREATE USER:",res)
       // })
       let registerPromise = registerUser(formValues)
       dispatch(setSignup(formValues))
       registerPromise.then(function () { navigate('/login') });
-      console.log("Form submitted successfully:", formValues);
-      // navigate("/otp");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     }
   };
 
@@ -173,6 +178,22 @@ const SignUpForm = () => {
             </MenuItem>
           ))}
         </Select>
+        <InputLabel id="select-label">County</InputLabel>
+        <Select
+          size="small"
+          name="county_id"
+          required
+          fullWidth
+          margin="normal"
+          value={formValues.county_id}
+          onChange={handleChange}
+        >
+          {counties.map((option) => (
+            <MenuItem key={option.code} value={option.code}>
+              {option.name}
+            </MenuItem>
+          ))}
+        </Select>
         <InputLabel id="select-label">Password</InputLabel>
         <TextField
           size="small"
@@ -190,11 +211,11 @@ const SignUpForm = () => {
         <InputLabel id="select-label">Select a Role</InputLabel>
         <Select
           size="small"
-          name="role_id"
+          name="role"
           required
           fullWidth
           margin="normal"
-          value={formValues.role_id}
+          value={formValues.role}
           onChange={handleChange}
         >
           {options.map((option) => (
@@ -205,7 +226,7 @@ const SignUpForm = () => {
         </Select>
 
         {
-          formValues.role_id === "cec" || formValues.role_id === "director" ? <>
+          formValues.role === "cec" || formValues.role === "director" ? <>
             <InputLabel id="select-label">Which Ministry do you work for</InputLabel>
             <TextField
               size="small"

@@ -76,7 +76,11 @@ const OTPForm = () => {
         toast.success('Verify Successfully!')
         // dispatch(setOtp(formValues))
         // dispatch(setLogin(formValues))
-        return navigate('/dashboard')
+        if(user.role === "revenueOfficer") {
+          return navigate('/appdownload')
+        } else {
+          return navigate('/dashboard')
+        }
       }  
       // dispatch(setOtp(formValues))
       // dispatch(setIsAuthenticated())

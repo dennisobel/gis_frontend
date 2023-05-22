@@ -19,6 +19,7 @@ import Performance from "scenes/performance";
 import Signup from "./scenes/signup";
 import OTPForm from "scenes/otp";
 import LoginForm from "scenes/login";
+import RedirectToAppDownloadPage from "components/RedirectToAppDownloadPage";
 import { AuthorizeUser, ProtectRoute } from './middleware/auth'
 
 
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/breakdown" element={<Breakdown />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/performance" element={<Performance />} />
+                <Route path="/appdownload" element={<RedirectToAppDownloadPage />} />
               </Route>
             )}
           </Routes>

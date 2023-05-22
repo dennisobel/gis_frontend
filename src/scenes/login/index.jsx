@@ -95,7 +95,7 @@ const LoginForm = () => {
           helperText={formErrors.kra && "Please enter your password"}
         />
 
-        <InputLabel id="select-label">Select a Role</InputLabel>
+        {/* <InputLabel id="select-label">Select a Role</InputLabel> */}
         {/* <Select
           size="small"
           name="role"

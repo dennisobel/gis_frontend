@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -105,6 +106,7 @@ const Sidebar = ({
   // const activePage = useSelector(state => state.global.activePage)
   const login = useSelector(state => state.global.login)
   const dispatch = useDispatch()
+  // const navigate = useNavigate()
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
   const navigate = useNavigate();
@@ -241,42 +243,42 @@ const Sidebar = ({
         break;
       case "revenueOfficer":
         setNav([
-      {
-        text: "Dashboard",
-        icon: <HomeOutlined />,
-      },
-      {
-        text: "Businesses",
-        icon: <Groups2Outlined />,
-      },
-      {
-        text: "Transactions",
-        icon: <ReceiptLongOutlined />,
-      },
-      {
-        text: "Geography",
-        icon: <PublicOutlined />,
-      },
-      {
-        text: "Revenue",
-        icon: null,
-      },
-      {
-        text: "Overview",
-        icon: <PointOfSaleOutlined />,
-      },
-      {
-        text: "Daily",
-        icon: <TodayOutlined />,
-      },
-      {
-        text: "Monthly",
-        icon: <CalendarMonthOutlined />,
-      },
-      {
-        text: "Performance",
-        icon: <TrendingUpOutlined />,
-      },
+      // {
+      //   text: "Dashboard",
+      //   icon: <HomeOutlined />,
+      // },
+      // {
+      //   text: "Businesses",
+      //   icon: <Groups2Outlined />,
+      // },
+      // {
+      //   text: "Transactions",
+      //   icon: <ReceiptLongOutlined />,
+      // },
+      // {
+      //   text: "Geography",
+      //   icon: <PublicOutlined />,
+      // },
+      // {
+      //   text: "Revenue",
+      //   icon: null,
+      // },
+      // {
+      //   text: "Overview",
+      //   icon: <PointOfSaleOutlined />,
+      // },
+      // {
+      //   text: "Daily",
+      //   icon: <TodayOutlined />,
+      // },
+      // {
+      //   text: "Monthly",
+      //   icon: <CalendarMonthOutlined />,
+      // },
+      // {
+      //   text: "Performance",
+      //   icon: <TrendingUpOutlined />,
+      // },
     ]);
         break;
       default:
@@ -457,6 +459,35 @@ const Sidebar = ({
               })}
             </List>
           </Box>
+
+            <FlexBetween>
+              <Button
+                onClick={() => navigate('/login')}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textTransform: "none",
+                  gap: "1rem",
+                }}
+              >
+                <Typography
+                  fontWeight="bold"
+                  fontSize="0.9rem"
+                  sx={{ color: theme.palette.secondary[400] }}
+                >
+                  LOGOUT
+                </Typography>
+              </Button>
+              {/* <Menu
+                anchorEl={dataAnchorEl}
+                open={isMapDataOpen}
+                onClose={handleMapDataClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              >
+                <MenuItem >Logout</MenuItem>)}
+              </Menu> */}
+            </FlexBetween>           
 
           {/* <Box position="absolute" bottom="2rem">
             <Divider />

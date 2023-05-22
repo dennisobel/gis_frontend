@@ -70,37 +70,7 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
         {/* RIGHT SIDE */}
         <FlexBetween gap="1rem">
           {activePage === "geography" && <>
-            {/* <FlexBetween>
-              <Button
-                onClick={handleMapDataClick}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  textTransform: "none",
-                  gap: "1rem",
-                }}
-              >
-                <Typography
-                  fontWeight="bold"
-                  fontSize="0.9rem"
-                  sx={{ color: theme.palette.secondary[400] }}
-                >
-                  MAP DATA
-                </Typography>
-                <ArrowDropDownOutlined
-                  sx={{ color: theme.palette.secondary[600], fontSize: "25px" }}
-                />
-              </Button>
-              <Menu
-                anchorEl={dataAnchorEl}
-                open={isMapDataOpen}
-                onClose={handleMapDataClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              >
-                {mapData.map(el => <MenuItem key={el} onClick={() => dispatch(setMapData(el))}>{el}</MenuItem>)}
-              </Menu>
-            </FlexBetween> */}
+
 
             <FlexBetween>
               <Button
