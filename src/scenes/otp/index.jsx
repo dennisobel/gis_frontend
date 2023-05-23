@@ -20,77 +20,46 @@ const OTPForm = () => {
   });
   const [user, setUser] = useState()
 
-  // ...
-
-useEffect(() => {
-  if (user) {
-    dispatch(setLogin(user));
-  }
-}, [user, dispatch]);
-
-useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const res = await getUsername();
-      setUser(res);
-    } catch (error) {
-      console.log("Error fetching user:", error);
+  useEffect(() => {
+    if (user) {
+      dispatch(setLogin(user));
     }
-  };
+  }, [user, dispatch]);
 
-  fetchUser();
-}, []);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUsername();
+        setUser(res);
+      } catch (error) {
+        console.log("Error fetching user:", error);
+      }
+    };
 
-useEffect(() => {
-  if (user) {
-    const msisdn = user.msisdn;
-    if (msisdn) {
-      generateOTP(msisdn)
-        .then((OTP) => {
-          console.log(OTP);
-          if (OTP) {
-            toast.success('OTP has been sent to your SMS!');
-          } else {
-            toast.error('Problem while generating OTP!');
-          }
-        })
-        .catch((error) => {
-          console.log("Error generating OTP:", error);
-        });
-    } else {
-      console.log("Email not found");
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const msisdn = user.msisdn;
+      if (msisdn) {
+        generateOTP(msisdn)
+          .then((OTP) => {
+            console.log(OTP);
+            if (OTP) {
+              toast.success('OTP has been sent to your SMS!');
+            } else {
+              toast.error('Problem while generating OTP!');
+            }
+          })
+          .catch((error) => {
+            console.log("Error generating OTP:", error);
+          });
+      } else {
+        console.log("Email not found");
+      }
     }
-  }
-}, [user]);
-
-// ...
-
-
-  // useEffect(() => {
-  //   getUser()
-  // }, [])
-
-  // useEffect(() => { 
-  //   dispatch(setLogin(user)) 
-  // }, [user])
-
-  // const getUser = () => {
-  //   getUsername().then(res => {
-  //     setUser(res)
-  //     const msisdn = res?.msisdn
-  //     return msisdn
-  //   }).then((msisdn) => {
-  //     if (msisdn) {
-  //       generateOTP(msisdn).then((OTP) => {
-  //         console.log(OTP)
-  //         if (OTP) toast.success('OTP has been send to your sms!');
-  //         toast.error('Problem while generating OTP!')
-  //       })
-  //     } else {
-  //       console.log("email not found")
-  //     }
-  //   })
-  // }
+  }, [user]);
 
   const [formErrors, setFormErrors] = useState({
     code: false,
