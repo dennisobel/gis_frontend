@@ -89,7 +89,7 @@ const SignUpForm = () => {
       dispatch(setSignup(formValues))
       registerPromise.then(function () { navigate('/login') });
       setTimeout(() => {
-        navigate("/login");
+        // navigate("/login");
       }, 2000);
     }
   };

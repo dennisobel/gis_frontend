@@ -119,6 +119,7 @@ const Sidebar = ({
   }, [pathname]);
 
   useEffect(() => {
+    console.log("ROLE:", login.role)
     switch (login.role) {
       case "governor":
         setNav([
@@ -235,145 +236,17 @@ const Sidebar = ({
             text: "Admin",
             icon: <AdminPanelSettingsOutlined />,
           },
-          {
-            text: "Performance",
-            icon: <TrendingUpOutlined />,
-          },
+          // {
+          //   text: "Performance",
+          //   icon: <TrendingUpOutlined />,
+          // },
         ]);
-        break;
-      case "revenueOfficer":
-        setNav([
-      // {
-      //   text: "Dashboard",
-      //   icon: <HomeOutlined />,
-      // },
-      // {
-      //   text: "Businesses",
-      //   icon: <Groups2Outlined />,
-      // },
-      // {
-      //   text: "Transactions",
-      //   icon: <ReceiptLongOutlined />,
-      // },
-      // {
-      //   text: "Geography",
-      //   icon: <PublicOutlined />,
-      // },
-      // {
-      //   text: "Revenue",
-      //   icon: null,
-      // },
-      // {
-      //   text: "Overview",
-      //   icon: <PointOfSaleOutlined />,
-      // },
-      // {
-      //   text: "Daily",
-      //   icon: <TodayOutlined />,
-      // },
-      // {
-      //   text: "Monthly",
-      //   icon: <CalendarMonthOutlined />,
-      // },
-      // {
-      //   text: "Performance",
-      //   icon: <TrendingUpOutlined />,
-      // },
-    ]);
         break;
       default:
         setNav([])
         break;
     }
-    // login.role === "management" ? setNav([
-    //   {
-    //     text: "Dashboard",
-    //     icon: <HomeOutlined />,
-    //   }, {
-    //     text: "Client Facing",
-    //     icon: null,
-    //   }, {
-    //     text: "Businesses",
-    //     icon: <Groups2Outlined />,
-    //   },
-    //   {
-    //     text: "Transactions",
-    //     icon: <ReceiptLongOutlined />,
-    //   },
-    //   {
-    //     text: "Geography",
-    //     icon: <PublicOutlined />,
-    //   }, {
-    //     text: "Revenue",
-    //     icon: null,
-    //   },
-    //   {
-    //     text: "Overview",
-    //     icon: <PointOfSaleOutlined />,
-    //   },
-    //   {
-    //     text: "Daily",
-    //     icon: <TodayOutlined />,
-    //   },
-    //   {
-    //     text: "Monthly",
-    //     icon: <CalendarMonthOutlined />,
-    //   },
-    //   {
-    //     text: "Breakdown",
-    //     icon: <PieChartOutlined />,
-    //   },
-    //   {
-    //     text: "Management",
-    //     icon: null,
-    //   },
-    //   {
-    //     text: "Admin",
-    //     icon: <AdminPanelSettingsOutlined />,
-    //   },
-    //   {
-    //     text: "Performance",
-    //     icon: <TrendingUpOutlined />,
-    //   },
-    // ]) : setNav([
-    //   {
-    //     text: "Dashboard",
-    //     icon: <HomeOutlined />,
-    //   },
-    //   {
-    //     text: "Businesses",
-    //     icon: <Groups2Outlined />,
-    //   },
-    //   {
-    //     text: "Transactions",
-    //     icon: <ReceiptLongOutlined />,
-    //   },
-    //   {
-    //     text: "Geography",
-    //     icon: <PublicOutlined />,
-    //   },
-    //   {
-    //     text: "Revenue",
-    //     icon: null,
-    //   },
-    //   {
-    //     text: "Overview",
-    //     icon: <PointOfSaleOutlined />,
-    //   },
-    //   {
-    //     text: "Daily",
-    //     icon: <TodayOutlined />,
-    //   },
-    //   {
-    //     text: "Monthly",
-    //     icon: <CalendarMonthOutlined />,
-    //   },
-    //   {
-    //     text: "Performance",
-    //     icon: <TrendingUpOutlined />,
-    //   },
-    // ])
-  }, [login])
+  }, [])
 
   return (
     <Box component="nav">
@@ -460,26 +333,26 @@ const Sidebar = ({
             </List>
           </Box>
 
-            <FlexBetween>
-              <Button
-                onClick={() => navigate('/login')}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  textTransform: "none",
-                  gap: "1rem",
-                }}
+          <FlexBetween>
+            <Button
+              onClick={() => navigate('/login')}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                textTransform: "none",
+                gap: "1rem",
+              }}
+            >
+              <Typography
+                fontWeight="bold"
+                fontSize="0.9rem"
+                sx={{ color: theme.palette.secondary[400] }}
               >
-                <Typography
-                  fontWeight="bold"
-                  fontSize="0.9rem"
-                  sx={{ color: theme.palette.secondary[400] }}
-                >
-                  LOGOUT
-                </Typography>
-              </Button>
-              {/* <Menu
+                LOGOUT
+              </Typography>
+            </Button>
+            {/* <Menu
                 anchorEl={dataAnchorEl}
                 open={isMapDataOpen}
                 onClose={handleMapDataClose}
@@ -487,7 +360,7 @@ const Sidebar = ({
               >
                 <MenuItem >Logout</MenuItem>)}
               </Menu> */}
-            </FlexBetween>           
+          </FlexBetween>
 
           {/* <Box position="absolute" bottom="2rem">
             <Divider />

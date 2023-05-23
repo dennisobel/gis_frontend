@@ -1,38 +1,42 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import FlexBetween from "components/FlexBetween";
-import { Box, useTheme, Button, Modal, TextField, Typography, Stack, Select, MenuItem, InputLabel, IconButton } from "@mui/material";
-import { useGetAdminsQuery } from "state/api";
+import { Box, useTheme, Select, MenuItem, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 import Header from "components/Header";
 import CustomColumnMenu from "components/DataGridCustomColumnMenu";
+import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import AddRevenueOfficerModal from "./AddRevenueOfficerModal"
 import ViewOfficer from "./ViewOfficer";
 import {
-  Edit,
   Delete,
-  PersonAdd,
-  Visibility,
 } from "@mui/icons-material";
-
-import { useDispatch } from "react-redux";
-import { setRevenueOfficer } from "state";
 import { useEffect } from "react";
+import { getUsers } from "helper/helper";
+import { updateUser } from "helper/helper";
+import { useSelector } from "react-redux";
 
 const Admin = () => {
-  const initialRows = []
-  const dispatch = useDispatch()
   const theme = useTheme();
-  const { data, isLoading } = useGetAdminsQuery();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [sort, setSort] = useState({});
   const [open, setOpen] = useState(false);
   const [openView, setOpenView] = useState(false)
-  const [officerData, setOfficerData] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    block: ""
-  })
-  const [rows, setRows] = React.useState(data);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [rows, setRows] = useState();
+  const user = useSelector(state => state.global.login)
+
+  useEffect(() => {
+    getUsers()
+      .then(({ data }) => {
+        const countyOfficers = data.filter((el) => {
+          return el.role === "revenueOfficer" && el.county_id === user.county_id
+        })
+        setRows(countyOfficers);
+      })
+  }, [])
 
   const handleOpen = () => {
     setOpen(true);
@@ -47,21 +51,28 @@ const Admin = () => {
   };
 
   function handleEditRowsModelChange(event) {
-    console.log("RED-DOT:",event,data)
-    const updatedRows = rows.map((row) => {
-      const { _id } = row;
-      const index = event.findIndex((item) => item._id === _id);
-      if (index > -1) {
-        return { ...row, ...event[index].changes };
-      }
-      return row;
-    });
-    setRows(updatedRows);
-  }
+    const changedRow = rows?.filter(row => row._id === Object.keys(event)[0]);
+    const flattenedEvent = Object.keys(event).reduce((result, key) => {
+      const innerObj = event[key];
+      Object.keys(innerObj).forEach(innerKey => {
+        result[innerKey] = innerObj[innerKey].value;
+      });
+      return result;
+    }, {});
 
-  useEffect(()=>{
-    console.log("ROWS:",rows)
-  },[rows])
+    console.log({ ...changedRow[0], ...flattenedEvent })
+
+    updateUser({ ...changedRow[0], ...flattenedEvent })
+      .then(() => {
+        console.log("UPDATE SUCCESS")
+      })
+      .catch(err => console.error(err))
+
+    const changes = event[Object.keys(event)[0]]?.changes;
+    if (changes) {
+      setRows([...rows.filter(row => row._id !== Object.keys(event)[0]), { ...changedRow[0], ...flattenedEvent }]);
+    }
+  }
 
   const wardOptions = [
     { value: "ward1", label: "Ward 1" },
@@ -83,7 +94,7 @@ const Admin = () => {
       editable: true
     },
     {
-      field: "phoneNumber",
+      field: "msisdn",
       headerName: "Phone Number",
       flex: 0.5,
       editable: true,
@@ -92,8 +103,8 @@ const Admin = () => {
       },
     },
     {
-      field: "country",
-      headerName: "Block",
+      field: "ward",
+      headerName: "Ward",
       flex: 0.4,
       editable: true,
       editCell: (params) => {
@@ -114,25 +125,25 @@ const Admin = () => {
         );
       },
     },
-    {
-      field: 'view',
-      headerName: 'View',
-      sortable: false,
-      width: 120,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        const handleEdit = (event) => {
-          event.stopPropagation();
-          setOpenView(true)
-        };
+    // {
+    //   field: 'view',
+    //   headerName: 'View',
+    //   sortable: false,
+    //   width: 120,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     const handleEdit = (event) => {
+    //       event.stopPropagation();
+    //       setOpenView(true)
+    //     };
 
-        return (
-          <IconButton variant="text" color="secondary" onClick={handleEdit}>
-            <Visibility />
-          </IconButton>
-        );
-      },
-    },
+    //     return (
+    //       <IconButton variant="text" color="secondary" onClick={handleEdit}>
+    //         <Visibility />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
     // {
     //   field: 'edit',
     //   headerName: 'Edit',
@@ -175,23 +186,9 @@ const Admin = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
-        <Header title="REVENUE ADMINS" subtitle="List of revenue admins" />
+        <Header title="REVENUE ADMINS" subtitle="List of revenue officers" />
 
         <Box>
-          <Button
-            sx={{
-              backgroundColor: theme.palette.secondary.light,
-              color: theme.palette.background.alt,
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-
-            onClick={handleOpen}
-          >
-            <PersonAdd sx={{ mr: "10px" }} />
-            Add Revenue Officer
-          </Button>
           <AddRevenueOfficerModal isOpen={open} onClose={handleClose} />
           <ViewOfficer isOpen={openView} onClose={handleCloseView} />
         </Box>
@@ -226,22 +223,41 @@ const Admin = () => {
         }}
       >
         <DataGrid
-          onCellEditStop={() => console.log("commited")}
+          onCellEditStop={(params) => {
+            const updatedRow = params.getRowParams(params.id).row;
+            const rowIndex = params.id;
+            console.log("Database updated:", updatedRow);
+          }}
           onEditRowsModelChange={handleEditRowsModelChange}
-          loading={isLoading || !data}
+          loading={!rows}
           getRowId={(row) => row._id}
-          rows={data || []}
+          // rows={data || []}
+          rows={rows || []}
           columns={columns}
           editMode="row"
+          rowsPerPageOptions={[20, 50, 100]}
+          pagination
+          page={page}
+          pageSize={pageSize}
+          paginationMode="server"
+          sortingMode="server"
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
           components={{
             ColumnMenu: CustomColumnMenu,
+            Toolbar: DataGridCustomToolbar
+          }}
+          componentsProps={{
+            toolbar: { searchInput, setSearchInput, setSearch },
           }}
           onRowKeyDown={(e) => {
             console.log("row entered")
           }}
-          onCellKeyDown={(event) => {
+          onCellKeyDown={(event, params) => {
+            // console.log("event:", event)
+            // console.log("params:", params)
             if (event.key === 'Enter') {
-              // handle the Enter key press here
               console.log('Enter key pressed');
             }
           }

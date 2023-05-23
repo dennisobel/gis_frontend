@@ -30,16 +30,16 @@ const OTPForm = () => {
   },[])
 
   const getUser = () => {
-    let user;
     getUsername().then(res => {
+      console.log("RES:",res)
       dispatch(setLogin(res))
       setUser(res)
       // user = res;
-      const email = res?.email
-      if (email) {
-        generateOTP(email).then((OTP) => {
+      const msisdn = res?.msisdn
+      if (msisdn) {
+        generateOTP(msisdn).then((OTP) => {
           console.log(OTP)
-          if (OTP) toast.success('OTP has been send to your email!');
+          if (OTP) toast.success('OTP has been send to your sms!');
           toast.error('Problem while generating OTP!')
         })
       } else {
@@ -71,7 +71,7 @@ const OTPForm = () => {
 
     if (!Object.values(errors).some(Boolean)) {
       console.log("Form submitted successfully:", formValues, user);
-      let { status } = await verifyOTP({ email: user.email, code: formValues.code  })
+      let { status } = await verifyOTP({ msisdn: user.msisdn, code: formValues.code  })
       if(status === 201){
         toast.success('Verify Successfully!')
         // dispatch(setOtp(formValues))
