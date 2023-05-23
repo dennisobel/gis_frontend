@@ -2,17 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   TextField,
   Card,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Button
 } from "@mui/material";
 import validator from "validator";
 import { useNavigate } from "react-router-dom";
-
-import { useDispatch, useSelector } from "react-redux";
-import { setLogin, setOtp } from "state";
+import { useDispatch } from "react-redux";
+import { setLogin } from "state";
 import { generateOTP, verifyOTP, getUsername } from '../../helper/helper';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,28 +20,77 @@ const OTPForm = () => {
   });
   const [user, setUser] = useState()
 
-  useEffect(() => {
-    getUser()
-  },[])
+  // ...
 
-  const getUser = () => {
-    getUsername().then(res => {
-      console.log("RES:",res)
-      dispatch(setLogin(res))
-      setUser(res)
-      // user = res;
-      const msisdn = res?.msisdn
-      if (msisdn) {
-        generateOTP(msisdn).then((OTP) => {
-          console.log(OTP)
-          if (OTP) toast.success('OTP has been send to your sms!');
-          toast.error('Problem while generating OTP!')
-        })
-      } else {
-        console.log("email not found")
-      }
-    })
+useEffect(() => {
+  if (user) {
+    dispatch(setLogin(user));
   }
+}, [user, dispatch]);
+
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await getUsername();
+      setUser(res);
+    } catch (error) {
+      console.log("Error fetching user:", error);
+    }
+  };
+
+  fetchUser();
+}, []);
+
+useEffect(() => {
+  if (user) {
+    const msisdn = user.msisdn;
+    if (msisdn) {
+      generateOTP(msisdn)
+        .then((OTP) => {
+          console.log(OTP);
+          if (OTP) {
+            toast.success('OTP has been sent to your SMS!');
+          } else {
+            toast.error('Problem while generating OTP!');
+          }
+        })
+        .catch((error) => {
+          console.log("Error generating OTP:", error);
+        });
+    } else {
+      console.log("Email not found");
+    }
+  }
+}, [user]);
+
+// ...
+
+
+  // useEffect(() => {
+  //   getUser()
+  // }, [])
+
+  // useEffect(() => { 
+  //   dispatch(setLogin(user)) 
+  // }, [user])
+
+  // const getUser = () => {
+  //   getUsername().then(res => {
+  //     setUser(res)
+  //     const msisdn = res?.msisdn
+  //     return msisdn
+  //   }).then((msisdn) => {
+  //     if (msisdn) {
+  //       generateOTP(msisdn).then((OTP) => {
+  //         console.log(OTP)
+  //         if (OTP) toast.success('OTP has been send to your sms!');
+  //         toast.error('Problem while generating OTP!')
+  //       })
+  //     } else {
+  //       console.log("email not found")
+  //     }
+  //   })
+  // }
 
   const [formErrors, setFormErrors] = useState({
     code: false,
@@ -71,20 +115,15 @@ const OTPForm = () => {
 
     if (!Object.values(errors).some(Boolean)) {
       console.log("Form submitted successfully:", formValues, user);
-      let { status } = await verifyOTP({ msisdn: user.msisdn, code: formValues.code  })
-      if(status === 201){
+      let { status } = await verifyOTP({ msisdn: user.msisdn, code: formValues.code })
+      if (status === 201) {
         toast.success('Verify Successfully!')
-        // dispatch(setOtp(formValues))
-        // dispatch(setLogin(formValues))
-        if(user.role === "revenueOfficer") {
+        if (user.role === "revenueOfficer") {
           return navigate('/appdownload')
         } else {
           return navigate('/dashboard')
         }
-      }  
-      // dispatch(setOtp(formValues))
-      // dispatch(setIsAuthenticated())
-      // navigate("/dashboard")
+      }
     }
   };
 
@@ -131,5 +170,4 @@ const OTPForm = () => {
   )
 }
 
-export default OTPForm
-
+export default React.memo(OTPForm)

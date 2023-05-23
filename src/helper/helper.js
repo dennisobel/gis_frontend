@@ -7,6 +7,7 @@ axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 /** To get email from Token */
 export async function getUsername() {
+    console.log("called")
   const token = localStorage.getItem("token");
   if (!token) return Promise.reject("Cannot find Token");
   let decode = jwt_decode(token);
