@@ -32,9 +32,9 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
-import profileImage from "assets/profile.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { setActivePage } from "state";
+import { getUsername } from "helper/helper";
 
 
 const navItems = [
@@ -106,7 +106,6 @@ const Sidebar = ({
   // const activePage = useSelector(state => state.global.activePage)
   const login = useSelector(state => state.global.login)
   const dispatch = useDispatch()
-  // const navigate = useNavigate()
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
   const navigate = useNavigate();
@@ -119,133 +118,135 @@ const Sidebar = ({
   }, [pathname]);
 
   useEffect(() => {
-    console.log("ROLE:", login.role)
-    switch (login.role) {
-      case "governor":
-        setNav([
-          {
-            text: "Dashboard",
-            icon: <HomeOutlined />,
-          }, {
-            text: "Client Facing",
-            icon: null,
-          },
-          {
-            text: "Geography",
-            icon: <PublicOutlined />,
-          }, {
-            text: "Revenue",
-            icon: null,
-          },
-          {
-            text: "Overview",
-            icon: <PointOfSaleOutlined />,
-          },
-          {
-            text: "Daily",
-            icon: <TodayOutlined />,
-          },
-          {
-            text: "Monthly",
-            icon: <CalendarMonthOutlined />,
-          },
-          {
-            text: "Breakdown",
-            icon: <PieChartOutlined />,
-          }
-        ]);
-        break;
-      case "cec":
-        setNav([
-          {
-            text: "Dashboard",
-            icon: <HomeOutlined />,
-          }, {
-            text: "Client Facing",
-            icon: null,
-          },
-          {
-            text: "Geography",
-            icon: <PublicOutlined />,
-          }, {
-            text: "Revenue",
-            icon: null,
-          },
-          {
-            text: "Overview",
-            icon: <PointOfSaleOutlined />,
-          },
-          {
-            text: "Daily",
-            icon: <TodayOutlined />,
-          },
-          {
-            text: "Monthly",
-            icon: <CalendarMonthOutlined />,
-          },
-          {
-            text: "Breakdown",
-            icon: <PieChartOutlined />,
-          }
-        ]);
-        break;
-      case "director":
-        setNav([
-          {
-            text: "Dashboard",
-            icon: <HomeOutlined />,
-          }, {
-            text: "Client Facing",
-            icon: null,
-          }, {
-            text: "Businesses",
-            icon: <Groups2Outlined />,
-          },
-          {
-            text: "Transactions",
-            icon: <ReceiptLongOutlined />,
-          },
-          {
-            text: "Geography",
-            icon: <PublicOutlined />,
-          }, {
-            text: "Revenue",
-            icon: null,
-          },
-          {
-            text: "Overview",
-            icon: <PointOfSaleOutlined />,
-          },
-          {
-            text: "Daily",
-            icon: <TodayOutlined />,
-          },
-          {
-            text: "Monthly",
-            icon: <CalendarMonthOutlined />,
-          },
-          {
-            text: "Breakdown",
-            icon: <PieChartOutlined />,
-          },
-          {
-            text: "Management",
-            icon: null,
-          },
-          {
-            text: "Admin",
-            icon: <AdminPanelSettingsOutlined />,
-          },
-          // {
-          //   text: "Performance",
-          //   icon: <TrendingUpOutlined />,
-          // },
-        ]);
-        break;
-      default:
-        setNav([])
-        break;
-    }
+    getUsername().then(res => {
+      switch (res.role) {
+        case "governor":
+          setNav([
+            {
+              text: "Dashboard",
+              icon: <HomeOutlined />,
+            }, {
+              text: "Client Facing",
+              icon: null,
+            },
+            {
+              text: "Geography",
+              icon: <PublicOutlined />,
+            }, {
+              text: "Revenue",
+              icon: null,
+            },
+            {
+              text: "Overview",
+              icon: <PointOfSaleOutlined />,
+            },
+            {
+              text: "Daily",
+              icon: <TodayOutlined />,
+            },
+            {
+              text: "Monthly",
+              icon: <CalendarMonthOutlined />,
+            },
+            {
+              text: "Breakdown",
+              icon: <PieChartOutlined />,
+            }
+          ]);
+          break;
+        case "cec":
+          setNav([
+            {
+              text: "Dashboard",
+              icon: <HomeOutlined />,
+            }, {
+              text: "Client Facing",
+              icon: null,
+            },
+            {
+              text: "Geography",
+              icon: <PublicOutlined />,
+            }, {
+              text: "Revenue",
+              icon: null,
+            },
+            {
+              text: "Overview",
+              icon: <PointOfSaleOutlined />,
+            },
+            {
+              text: "Daily",
+              icon: <TodayOutlined />,
+            },
+            {
+              text: "Monthly",
+              icon: <CalendarMonthOutlined />,
+            },
+            {
+              text: "Breakdown",
+              icon: <PieChartOutlined />,
+            }
+          ]);
+          break;
+        case "director":
+          setNav([
+            {
+              text: "Dashboard",
+              icon: <HomeOutlined />,
+            }, {
+              text: "Client Facing",
+              icon: null,
+            }, {
+              text: "Businesses",
+              icon: <Groups2Outlined />,
+            },
+            {
+              text: "Transactions",
+              icon: <ReceiptLongOutlined />,
+            },
+            {
+              text: "Geography",
+              icon: <PublicOutlined />,
+            }, {
+              text: "Revenue",
+              icon: null,
+            },
+            {
+              text: "Overview",
+              icon: <PointOfSaleOutlined />,
+            },
+            {
+              text: "Daily",
+              icon: <TodayOutlined />,
+            },
+            {
+              text: "Monthly",
+              icon: <CalendarMonthOutlined />,
+            },
+            {
+              text: "Breakdown",
+              icon: <PieChartOutlined />,
+            },
+            {
+              text: "Management",
+              icon: null,
+            },
+            {
+              text: "Admin",
+              icon: <AdminPanelSettingsOutlined />,
+            },
+            // {
+            //   text: "Performance",
+            //   icon: <TrendingUpOutlined />,
+            // },
+          ]);
+          break;
+        default:
+          setNav([])
+          break;
+      }
+    })
+
   }, [])
 
   return (
