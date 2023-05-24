@@ -7,7 +7,6 @@ axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 /** To get email from Token */
 export async function getUsername() {
-  console.log("called");
   const token = localStorage.getItem("token");
   if (!token) return Promise.reject("Cannot find Token");
   let decode = jwt_decode(token);
@@ -162,9 +161,9 @@ export async function getBuildingById({ _id }) {
 }
 
 /** get buildings */
-export async function getAllBuildings() {
+export async function getAllCountyBuildings(county) {
   try {
-    const data = await axios.get("/buildings/buildings");
+    const data = await axios.get(`/buildings/buildings/${county}`);
     return data;
   } catch (error) {
     return { error: "Buildings not found" };
@@ -204,6 +203,16 @@ export async function createBusiness(body) {
       return { error };
     }
   }
+
+  /** get businesses by building id */
+  export async function getBuildingStores(id) {
+    try {
+        const data = await axios.get(`/business/businesses/${id}`)
+        return data
+    } catch (error) {
+        return { error: "Stores not found" };
+    }
+  }
   
   /** get businesses */
   export async function getAllBusinesses() {
@@ -228,3 +237,12 @@ export async function createBusiness(body) {
       return Promise.reject({ error: "Couldn't Update Building...!" });
     }
   }
+   /**Get county */
+   export async function getCounty(code) {
+    try {
+        const county = await axios.get(`/county/counties/${code}`)
+        return county
+    } catch (error) {
+        return { error: "County not found" };
+    }
+   }
