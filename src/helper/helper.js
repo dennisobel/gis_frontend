@@ -7,7 +7,7 @@ axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 /** To get email from Token */
 export async function getUsername() {
-    console.log("called")
+  console.log("called");
   const token = localStorage.getItem("token");
   if (!token) return Promise.reject("Cannot find Token");
   let decode = jwt_decode(token);
@@ -140,3 +140,91 @@ export async function resetPassword({ email, password }) {
     return Promise.reject({ error });
   }
 }
+
+/** create building */
+export async function createBuilding(body) {
+  try {
+    const data = await axios.post(`/buildings/create`, body);
+    return Promise.resolve(data);
+  } catch (error) {
+    return Promise.reject({ error });
+  }
+}
+
+/** get building */
+export async function getBuildingById({ _id }) {
+  try {
+    const { data } = await axios.get(`/buildings/building/${_id}`);
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+}
+
+/** get buildings */
+export async function getAllBuildings() {
+  try {
+    const data = await axios.get("/buildings/buildings");
+    return data;
+  } catch (error) {
+    return { error: "Buildings not found" };
+  }
+}
+
+/** update building function */
+export async function updateBuilding(building) {
+  try {
+    const token = await localStorage.getItem("token");
+    const data = await axios.put("/building/update", building, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return Promise.resolve({ data });
+  } catch (error) {
+    return Promise.reject({ error: "Couldn't Update Building...!" });
+  }
+}
+
+/** create business */
+export async function createBusiness(body) {
+    try {
+      const data = await axios.post(`/business/register`, body);
+      return Promise.resolve(data);
+    } catch (error) {
+      return Promise.reject({ error });
+    }
+  }
+  
+  /** get business */
+  export async function getBusinessById({ business }) {
+    try {
+      const { data } = await axios.get(`/business/business/${business}`);
+      return { data };
+    } catch (error) {
+      return { error };
+    }
+  }
+  
+  /** get businesses */
+  export async function getAllBusinesses() {
+    try {
+      const data = await axios.get("/business/businesses");
+      return data;
+    } catch (error) {
+      return { error: "Buildings not found" };
+    }
+  }
+  
+  /** update business function */
+  export async function updateBusiness(_id) {
+    try {
+      const token = await localStorage.getItem("token");
+      const data = await axios.put("/business/update", _id, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      return Promise.resolve({ data });
+    } catch (error) {
+      return Promise.reject({ error: "Couldn't Update Building...!" });
+    }
+  }
