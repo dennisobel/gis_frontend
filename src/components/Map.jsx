@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Map, { Marker, Popup, NavigationControl, Source, Layer} from 'react-map-gl';
+import Map, { Marker, Popup, NavigationControl, Source, Layer } from 'react-map-gl';
 import { interpolateOranges, interpolateGreens, interpolateReds, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { useSelector } from 'react-redux';
 import Dot from './Dot';
@@ -8,14 +8,15 @@ import MapboxDirections from '@mapbox/mapbox-sdk/services/directions'
 import polyline from '@mapbox/polyline';
 import * as turf from '@turf/turf'
 
+
 const MapView = ({ markers }) => {
+    const countyBuildings = useSelector(state => state.global.countyBuildings)
     const [userLocation, setUserLocation] = useState(null);
     const mapType = useSelector(state => state.global.mapType)
     const MapMarker = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9c0 6 7 13 7 13s7-7 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /%3E%3C/svg%3E'
     const selectedMarkerRef = useRef();
     const [selectedMarker, setSelectedMarker] = useState();
     const [directions, setDirections] = useState(null);
-
     const [viewport, setViewport] = useState({
         latitude: -1.2717167,
         longitude: 36.8139821,
@@ -26,6 +27,13 @@ const MapView = ({ markers }) => {
     const directionsClient = MapboxDirections({
         accessToken: MAPBOX_TOKEN,
     });
+
+    const paymentStatusColors = {
+        "Paid": "green",
+        "Partially Paid": "yellow",
+        "Not Paid": "red",
+        "No Occupants": "blue"
+      };
 
     useEffect(() => {
         if (userLocation) {
@@ -39,6 +47,7 @@ const MapView = ({ markers }) => {
     }, [userLocation]);
 
     useEffect(() => {
+        console.log(countyBuildings)
         getUserLocation();
     }, []);
 
@@ -59,7 +68,10 @@ const MapView = ({ markers }) => {
     };
 
     const handleSelected = async (marker) => {
+        console.log("selectde:",marker.properties.singleBusinessPermits)
+        console.log(marker.properties.paymentstatus)
         setSelectedMarker((prevMarker) => prevMarker === marker ? null : marker);
+        // setSelectedMarker(marker)
         const origin = [userLocation.longitude, userLocation.latitude];
         const destination = [marker?.properties?.longitude, marker?.properties?.latitude];
         const response = await directionsClient.getDirections({
@@ -116,7 +128,7 @@ const MapView = ({ markers }) => {
         type: 'heatmap',
         source: {
             type: 'geojson',
-            data: markers
+            data: countyBuildings
         },
         paint: {
             'heatmap-opacity': 0.8,
@@ -151,24 +163,27 @@ const MapView = ({ markers }) => {
             mapboxAccessToken={MAPBOX_TOKEN}
         >
             {userLocation && (
-                <Marker latitude={userLocation.latitude} longitude={userLocation.longitude}>
+                <Marker latitude={userLocation?.latitude} longitude={userLocation?.longitude}>
                     <div>📍</div>
                 </Marker>
             )}
 
-            {mapType === "Markers" ? (markers.map((marker, index) => (
+            {mapType === "Markers" ? (countyBuildings.map((marker, index) =>
+            (
                 <Marker key={index} latitude={marker.properties.latitude} longitude={marker.properties.longitude} anchor="bottom">
                     <img
-                        onClick={() => { handleSelected(marker); }}
+                        onClick={() => handleSelected(marker)}
                         style={{
-                            height: "30px",
-                            width: "30px",
+                            height: "20px",
+                            width: "15px",
                             cursor: "pointer",
-                            backgroundColor: marker.properties.paymentstatus === "paid" ? "green" : marker.properties.paymentstatus === "partially paid" ? "yellow" : "red", borderRadius: "50px"
+                            // backgroundColor: marker.properties.paymentstatus === "Paid" ? "green" : marker.properties.paymentstatus === "Partially Paid" ? "yellow" : marker.properties.paymentstatus === "Not Paid" ? "red" : "grey", borderRadius: "50px"
+                            backgroundColor: paymentStatusColors[marker.properties.paymentstatus],
+                            borderRadius: "50px"
                         }}
                         src={MapMarker} alt="mapmarker" />
                 </Marker>
-            ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: markers }}>
+            ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: countyBuildings }}>
                 <Layer style={{ cursor: 'pointer' }}  {...heatmapLayer} onClick={(e) => {
                     const marker = e.features[0];
                     handleSelected(marker)

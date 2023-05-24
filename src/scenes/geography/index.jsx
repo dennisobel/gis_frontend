@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { setActivePage } from "state";
+import { setActivePage, setCountyBuildings } from "state";
 import buildingsdata from "./buildingsdata"
 import storedata from "./storedata"
-import {getAllCountyBuildings, getUsername, getCounty} from "../../helper/helper"
+import { getAllCountyBuildings, getUsername, getCounty } from "../../helper/helper"
 
 import MapView from "components/Map";
 import Map from "components/Mapp"
@@ -15,13 +15,59 @@ const Geography = () => {
   const mapData = useSelector(state => state.global.mapData)
   const theme = useTheme();
   const [user, setUser] = useState()
-  const [county,setCounty] = useState()
-  const [countyBuildings,setCountyBuildings] = useState()
+  const [county, setCounty] = useState()
+  const [countyBuildings, setCountyBuildings] = useState()
 
   // const markers = buildingsdata.features;
 
-  const [markers,setMarkers] = useState([])
+  const [markers, setMarkers] = useState([])
   const [filteredMarkers, setFilteredMarkers] = useState([...markers])
+  function renameObjectKeys(array, keyMap) {
+    const newArray = [];
+
+    for (let i = 0; i < array.length; i++) {
+      const oldObject = array[i];
+      const newObject = {};
+
+      for (let oldKey in oldObject) {
+        if (oldObject.hasOwnProperty(oldKey)) {
+          const newKey = keyMap[oldKey] || oldKey;
+          newObject[newKey] = oldObject[oldKey];
+        }
+      }
+      newArray.push(newObject);
+    }
+
+    return newArray;
+  }
+
+  function getPaymentStatusDistribution(permits) {
+    const result = permits?.reduce((acc, permit) => {
+      const paymentStatus = permit.payment_status;
+
+      if (paymentStatus === 'Paid') {
+        acc.paid++;
+      } else if (paymentStatus === 'Partially Paid') {
+        acc.partiallyPaid++;
+      } else if (paymentStatus === 'Not Paid') {
+        acc.notPaid++;
+      }
+
+      return acc;
+    }, { paid: 0, partiallyPaid: 0, notPaid: 0 });
+
+    if (permits.length === 0) {
+      // Return empty result if the permits array is empty
+      return "No Occupants";
+    }
+
+    // return result;
+    const highestPaymentStatus = Object.keys(result).reduce((a, b) =>
+      result[a] > result[b] ? a : b
+    );
+
+    return highestPaymentStatus;
+  }
 
   useEffect(() => {
     dispatch(setActivePage("geography"))
@@ -29,13 +75,12 @@ const Geography = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("USER:",user)
       const fetchCounty = async () => {
         try {
-          const res = await getCounty(user.county_id)
-          setCounty(res.data[0].name)
+          const { data } = await getCounty(user.county_id)
+          setCounty(data[0].name)
         } catch (error) {
-          
+          console.log("Error fetching county:", error);
         }
       }
 
@@ -43,14 +88,53 @@ const Geography = () => {
     }
   }, [user]);
 
-  useEffect(()=>{
-    console.log("COUNTY:",county)
-    if(county){
+  useEffect(() => {
+    if (county) {
       const fetchBuildings = async () => {
         try {
-          const {data} = await getAllCountyBuildings(county)
-          console.log("RES:",data)
-          setCountyBuildings(data)
+          const { data } = await getAllCountyBuildings(county)
+          const keyMap = {
+            building_number: "buildingNumber",
+            street: "streetname",
+            sub_county: "subcounty",
+            type_of_structure: "typeofstructure"
+          }
+          const renamed = renameObjectKeys(data, keyMap)
+          const mapped = renamed.map((obj) => {
+            // console.log(obj)
+            const paymentDistribution = getPaymentStatusDistribution(obj?.singleBusinessPermits)
+            const { latitude, longitude, ...properties } = obj;            
+            // console.log(paymentDistribution)
+            // console.log(obj?.singleBusinesPermits)
+            let payment_status
+            if (paymentDistribution == "notPaid") {
+              payment_status = "Not Paid"
+            } else if (paymentDistribution == "partiallyPaid") {
+              payment_status = "Partially Paid"
+            } else if (paymentDistribution == "paid") {
+              payment_status = "Paid"
+            } else if (paymentDistribution == "No Occupants") {
+              payment_status = "No Occupants"
+            }
+
+            return {
+              type: "Feature",
+              properties: {
+                ...properties,
+                latitude,
+                longitude,
+                paymentstatus: payment_status
+              },
+              geometry: {
+                type: "Point",
+                coordinates: [longitude, latitude]
+              }
+            };
+          });
+
+          console.log(mapped)
+          dispatch(setCountyBuildings(mapped))
+          setCountyBuildings(mapped)
         } catch (error) {
           console.log("Error fetching buildings:", error);
         }
@@ -58,7 +142,7 @@ const Geography = () => {
 
       fetchBuildings()
     }
-  },[county])
+  }, [county])
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -74,9 +158,8 @@ const Geography = () => {
   }, []);
 
   useEffect(() => {
-    console.log("MAP DATA:", mapData)
     mapData === "Buildings" ? setMarkers(buildingsdata.features) : setMarkers(storedata.features)
-  },[mapData])
+  }, [mapData])
 
   useEffect(() => {
     setFilteredMarkers(markers)
@@ -101,7 +184,7 @@ const Geography = () => {
 
       if (marker.properties.buildingnumber.toLowerCase().includes(searchQuery.toLowerCase())) {
         return marker.properties.buildingnumber.toLowerCase().includes(searchQuery.toLowerCase())
-      }   
+      }
 
       if (marker.properties.paymentstatus.toLowerCase().includes(searchQuery.toLowerCase())) {
         return marker.properties.paymentstatus.toLowerCase() === searchQuery.toLowerCase()
@@ -118,7 +201,9 @@ const Geography = () => {
 
   return (
     <React.Fragment>
-      <MapView markers={filteredMarkers} />
+      {/* <MapView markers={filteredMarkers} /> */}
+      {countyBuildings && <MapView markers={countyBuildings} />}
+      
     </React.Fragment>
   );
 };
