@@ -29,7 +29,7 @@ const initialState = {
   },
   mapType: "Markers",
   mapData: "Buildings",
-  countyBuildings: [],
+  buildings: [],
   role: "Revenue Officer"
 };
 
@@ -70,10 +70,8 @@ export const globalSlice = createSlice({
     setRole: (state, action) => {
       state.role = action.payload
     },
-    setCountyBuildings: (state, action) => {
-      return {
-        ...state.countyBuildings, ...action.payload
-      }
+    setBuildings: (state, action) => {
+      state.buildings = action.payload
     }
 
   },
@@ -91,7 +89,7 @@ export const {
   setMapType,
   setMapData,
   setRole,
-  setCountyBuildings
+  setBuildings
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

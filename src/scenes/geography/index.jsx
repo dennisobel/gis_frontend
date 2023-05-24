@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { setActivePage, setCountyBuildings } from "state";
+import { setActivePage, setBuildings } from "state";
 import buildingsdata from "./buildingsdata"
 import storedata from "./storedata"
 import { getAllCountyBuildings, getUsername, getCounty } from "../../helper/helper"
@@ -73,6 +73,10 @@ const Geography = () => {
     dispatch(setActivePage("geography"))
   }, []);
 
+  useEffect(()=>{
+    dispatch(setBuildings(countyBuildings))
+  },[countyBuildings])
+
   useEffect(() => {
     if (user) {
       const fetchCounty = async () => {
@@ -133,7 +137,6 @@ const Geography = () => {
           });
 
           console.log(mapped)
-          dispatch(setCountyBuildings(mapped))
           setCountyBuildings(mapped)
         } catch (error) {
           console.log("Error fetching buildings:", error);

@@ -1,131 +1,129 @@
 import React from 'react'
-import DirectionsIcon from '@mui/icons-material/Directions';
-import ContactMailIcon from '@mui/icons-material/ContactMail';
 import { useSelector } from 'react-redux';
 import {
-    TextField,
-    Card,
-    Button,
-    InputLabel,
-    Select,
-    MenuItem, List, ListItem, ListItemText
+    List, ListItem, ListItemText, TextareaAutosize
 } from "@mui/material";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import ReactPaginate from 'react-paginate';
 
 
 function PopupDetails({ selectedMarker }) {
+    const countyBuildings = useSelector(state => state.global.buildings)
+    const [paymentdistribution, setPaymentDistribution] = useState()
+    const [message,setMessage] = useState();
 
-    const countyBuildings = useSelector(state => state.global.countyBuildings)
-    const selected = countyBuildings.filter(el => {
-        return el._id === selectedMarker._id
-    })
-    console.log(selected)
     useEffect(() => {
-        console.log(selectedMarker)
-        // function getPaymentStatusDistribution(permits) {
-        //     const result = permits?.reduce((acc, permit) => {
-        //         const paymentStatus = permit.payment_status;
+        console.log(countyBuildings)
+        const selected = countyBuildings.filter(el => {
+            return el.properties._id === selectedMarker.properties._id
+        })
 
-        //         if (paymentStatus === 'Paid') {
-        //             acc.paid++;
-        //         } else if (paymentStatus === 'Partially Paid') {
-        //             acc.partiallyPaid++;
-        //         } else if (paymentStatus === 'Not Paid') {
-        //             acc.notPaid++;
-        //         }
+        console.log(selected)
 
-        //         return acc;
-        //     }, { paid: 0, partiallyPaid: 0, notPaid: 0 });
+        function getPaymentStatusDistribution(permits) {
+            const result = permits?.reduce((acc, permit) => {
+                const paymentStatus = permit.payment_status;
 
-        //     if (permits.length === 0) {
-        //         return "No Occupants";
-        //     }
+                if (paymentStatus === 'Paid') {
+                    acc.paid++;
+                } else if (paymentStatus === 'Partially Paid') {
+                    acc.partiallyPaid++;
+                } else if (paymentStatus === 'Not Paid') {
+                    acc.notPaid++;
+                }
 
-        //     const highestPaymentStatus = Object.keys(result).reduce((a, b) =>
-        //         result[a] > result[b] ? a : b
-        //     );
+                return acc;
+            }, { paid: 0, partiallyPaid: 0, notPaid: 0 });
 
-        //     return highestPaymentStatus;
-        // }
+            if (permits.length === 0) {
+                return "No Occupants";
+            }
 
-        // const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || [])
-        // console.log(paymentDistribution)
+            return result
+        }
+
+        const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || [])
+        setPaymentDistribution(paymentDistribution)
+        console.log(paymentDistribution)
     }, [selectedMarker])
+
+    const handleMessage = event => {
+        setMessage(event.target.value);
+    };
+
+    const handleKeyDown = (event) => {
+        
+        if (event.key === 'Enter') {
+            event.preventDefault()
+          // Handle the data on Enter key press
+          console.log('Message entered:', message);
+          // You can perform any additional logic or actions with the captured data
+        //   Cleanup
+        setMessage(' '); // Temporarily change the message to a different value
+        // setTimeout(() => setMessage(''), 100);
+        }
+      };
     return (
-        // <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        //     <div className="relative w-full max-w-2xl max-h-full">
-
-        //         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-        //             <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-        //                 <h6 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     {selectedMarker.properties.description}
-        //                 </h6>
-
-        //             </div>
-        //             <div className="p-6 space-y-6">
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Sub County
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.subcounty}
-        //                 </p>
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Ward
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.ward}
-        //                 </p>
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Street
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.streetname}
-        //                 </p>
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Building
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.buildingnumber}
-        //                 </p>
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Structure
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.typeofstructure}
-        //                 </p>
-        //                 <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
-        //                     Payment Status
-        //                 </h5>
-        //                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-        //                     {selectedMarker.properties.paymentstatus}
-        //                 </p>
-        //             </div>
-        //         </div>
-
-        //         <Card sx={{ maxWidth: 500, margin: "0 auto", mt: 5, p: 3 }}>
-        //             <InputLabel id="select-label">Message</InputLabel>
-        //             <TextField
-        //                 size="small"
-        //                 required
-        //                 fullWidth
-        //                 margin="normal"
-        //                 name="text"
-        //                 type="text"
-        //             /> <br/>
-        //             <ContactMailIcon sx={{ fontSize: 34, cursor: 'pointer' }} />
-        //         </Card>
-        //     </div>
-        // </div>
-
         <List>
-            <ListItem>
-                <ListItemText primary={"BUILDING"} />
+            <ListItem sx={{marginBottom: '-20px',}}>
+                <ListItemText sx={{
+                    fontSize: '8px',
+                    
+                }} primary={`NP-${paymentdistribution?.notPaid} : PP-${paymentdistribution?.partiallyPaid} : P-${paymentdistribution?.paid}`} />
             </ListItem>
-            {selectedMarker?.properties?.singleBusinessPermits.map((store) => (
-                <ListItem key={store._id}>
-                    <ListItemText primary={"1"} secondary={"Hi"} />
-                </ListItem>
-            ))}
+            <ListItem>
+                <ListItemText sx={{
+                    fontSize: '8px',
+                }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
+            </ListItem>
+            {selectedMarker?.properties?.singleBusinessPermits.map((store) => {
+                let borderColor;
+                if (store.payment_status === 'Paid') {
+                    borderColor = 'green';
+                } else if (store.payment_status === 'Not Paid') {
+                    borderColor = 'red';
+                } else if (store.payment_status === 'Partially Paid') {
+                    borderColor = 'gold';
+                } else {
+                    borderColor = 'teal';
+                }
+                return (
+
+                    <ListItem
+                        key={store.store_no}
+                        sx={{
+                            marginBottom: '10px',
+                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                            border: `2px solid ${borderColor}`,
+                            borderRadius: '2px',
+                        }}
+                    >
+                        <div>
+                        <ListItemText
+                            secondary={`Sore # - ${store.store_no} - ${store.payment_status}`}
+                            primary={store.business_name}
+                            sx={{
+                                fontSize: '12px',
+                            }}
+                        />
+                        <TextareaAutosize
+                            rows={4} // Specify the number of rows for the textarea
+                            placeholder="..."
+                            sx={{
+                                width: '100%', 
+                                resize: 'vertical',
+                                borderRadius: '2px',
+                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                border: `1px solid ${borderColor}`,
+                            }}
+                            value={message}
+                            onKeyDown={handleKeyDown}
+                            onChange={handleMessage}
+                        />
+                        </div>
+                    </ListItem>
+                )
+            })}
         </List>
     )
 }
