@@ -5,9 +5,7 @@ import { setActivePage, setBuildings } from "state";
 import buildingsdata from "./buildingsdata"
 import storedata from "./storedata"
 import { getAllCountyBuildings, getUsername, getCounty } from "../../helper/helper"
-
 import MapView from "components/Map";
-import Map from "components/Mapp"
 
 const Geography = () => {
   const dispatch = useDispatch()
@@ -95,7 +93,8 @@ const Geography = () => {
 
   useEffect(() => {
     console.log(buildings)
-    if (county) {
+    if(buildings?.length === 0)
+{    if (county) {
       const fetchBuildings = async () => {
         try {
           const { data } = await getAllCountyBuildings(county)
@@ -144,10 +143,11 @@ const Geography = () => {
       }
 
       fetchBuildings()
-    }
+    }}
   }, [county])
 
   useEffect(() => {
+    console.log("BUILDINGS:",buildings)
     const fetchUser = async () => {
       try {
         const res = await getUsername();
@@ -207,7 +207,7 @@ const Geography = () => {
 
   useEffect(() => {
     console.log("FILTERED:",filteredBuildings)
-    dispatch(setBuildings(filteredBuildings))
+    filteredBuildings !== undefined && dispatch(setBuildings(filteredBuildings))
   },[filteredBuildings])
 
 
