@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import {
-    List, ListItem, ListItemText, TextareaAutosize
+    List, ListItem, ListItemText, TextareaAutosize, Grid, Card
 } from "@mui/material";
-import { useEffect, useState } from 'react';
-import ReactPaginate from 'react-paginate';
-
+import { Padding } from '@mui/icons-material';
 
 function PopupDetails({ selectedMarker }) {
     const countyBuildings = useSelector(state => state.global.buildings)
+    const searchQuery = useSelector(state => state.global.searchQuery)
     const [paymentdistribution, setPaymentDistribution] = useState()
-    const [message,setMessage] = useState();
+    const [message, setMessage] = useState();
+    const [toggleChatArray, setToggleChatArray] = useState([]);
+    const [selectedindex, setSelectedIndex] = useState(-1)
+    const [currentstore, setCurrentStore] = useState()
 
     useEffect(() => {
         console.log(countyBuildings)
@@ -42,89 +44,236 @@ function PopupDetails({ selectedMarker }) {
             return result
         }
 
-        const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || [])
-        setPaymentDistribution(paymentDistribution)
-        console.log(paymentDistribution)
+        if (selectedMarker) {
+            const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || []);
+            setPaymentDistribution(paymentDistribution);
+        }
     }, [selectedMarker])
 
-    const handleMessage = event => {
-        setMessage(event.target.value);
+    const handleToggleChat = (index, store) => {
+        const newToggleChatArray = [...toggleChatArray];
+        newToggleChatArray[index] = !newToggleChatArray[index];
+        setToggleChatArray(newToggleChatArray);
+        setSelectedIndex(index === selectedindex ? -1 : index);
+        setCurrentStore(store)
     };
 
-    const handleKeyDown = (event) => {
-        
-        if (event.key === 'Enter') {
-            event.preventDefault()
-          // Handle the data on Enter key press
-          console.log('Message entered:', message);
-          // You can perform any additional logic or actions with the captured data
-        //   Cleanup
-        setMessage(' '); // Temporarily change the message to a different value
-        // setTimeout(() => setMessage(''), 100);
-        }
-      };
-    return (
-        <List>
-            <ListItem sx={{marginBottom: '-20px',}}>
-                <ListItemText sx={{
-                    fontSize: '8px',
-                    
-                }} primary={`NP-${paymentdistribution?.notPaid} : PP-${paymentdistribution?.partiallyPaid} : P-${paymentdistribution?.paid}`} />
-            </ListItem>
-            <ListItem>
-                <ListItemText sx={{
-                    fontSize: '8px',
-                }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
-            </ListItem>
-            {selectedMarker?.properties?.singleBusinessPermits.map((store) => {
-                let borderColor;
-                if (store.payment_status === 'Paid') {
-                    borderColor = 'green';
-                } else if (store.payment_status === 'Not Paid') {
-                    borderColor = 'red';
-                } else if (store.payment_status === 'Partially Paid') {
-                    borderColor = 'gold';
-                } else {
-                    borderColor = 'teal';
-                }
-                return (
+    const handleMessage = useCallback((event) => {
+        setMessage(event.target.value);
+    }, []);
 
-                    <ListItem
-                        key={store.store_no}
-                        sx={{
-                            marginBottom: '10px',
-                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                            border: `2px solid ${borderColor}`,
-                            borderRadius: '2px',
-                        }}
-                    >
-                        <div>
-                        <ListItemText
-                            secondary={`Sore # - ${store.store_no} - ${store.payment_status}`}
-                            primary={store.business_name}
-                            sx={{
-                                fontSize: '12px',
-                            }}
-                        />
-                        <TextareaAutosize
-                            rows={4} // Specify the number of rows for the textarea
-                            placeholder="..."
-                            sx={{
-                                width: '100%', 
-                                resize: 'vertical',
-                                borderRadius: '2px',
-                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                                border: `1px solid ${borderColor}`,
-                            }}
-                            value={message}
-                            onKeyDown={handleKeyDown}
-                            onChange={handleMessage}
-                        />
-                        </div>
+    const handleKeyDown = useCallback((event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            console.log('Message entered:', message);
+            setMessage(''); // Clear the message after pressing Enter
+        }
+    }, [message]);
+    return (
+        <Grid width={700} height={500} container spacing={1} sx={{ maxWidth: "700px", maxHeight: "700px" }}>
+            <Grid item xs={6}>
+                <List>
+                    <ListItem sx={{ marginBottom: '-20px', }}>
+                        <ListItemText sx={{
+                            fontSize: '8px',
+
+                        }} primary={`NP-${paymentdistribution?.notPaid} : PP-${paymentdistribution?.partiallyPaid} : P-${paymentdistribution?.paid}`} />
                     </ListItem>
+                    <ListItem>
+                        <ListItemText sx={{
+                            fontSize: '8px',
+                        }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
+                    </ListItem>
+
+                    {selectedMarker?.properties?.singleBusinessPermits
+                        .filter((store) => {
+                            const { business_category, is_building_open, store_no } = store;
+                            const permitObj = { business_category, is_building_open, store_no };
+
+                            for (const key in permitObj) {
+                                if (permitObj[key].toString().toLowerCase().includes(searchQuery.toLowerCase())) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        })
+                        .map((store, index) => {
+                            let borderColor;
+                            if (store.payment_status === 'Paid') {
+                                borderColor = 'green';
+                            } else if (store.payment_status === 'Not Paid') {
+                                borderColor = 'red';
+                            } else if (store.payment_status === 'Partially Paid') {
+                                borderColor = 'gold';
+                            } else {
+                                borderColor = 'teal';
+                            }
+
+                            return (
+                                <ListItem
+                                    key={index}
+                                    sx={{
+                                        marginBottom: '10px',
+                                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                        border: `2px solid ${borderColor}`,
+                                        borderRadius: '2px',
+                                        cursor: "pointer"
+                                    }}
+                                    onClick={() => handleToggleChat(index, store)}
+                                >
+                                    <div>
+                                        <ListItemText
+                                            secondary={`Store # - ${store.store_no} - ${store.payment_status}`}
+                                            primary={`${store.business_name}->${store.business_category}`}
+                                            sx={{
+                                                fontSize: '12px',
+                                            }}
+                                        />
+                                    </div>
+                                </ListItem>
+                            );
+                        })
+                    }
+
+                    {selectedMarker?.properties?.singleBusinessPermits
+                        .filter((store) => {
+                            const { business_category, is_building_open, store_no } = store;
+                            const permitObj = { business_category, is_building_open, store_no };
+
+                            for (const key in permitObj) {
+                                if (permitObj[key].toString().toLowerCase().includes(searchQuery.toLowerCase())) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        })
+                        .length === 0 && (
+                            selectedMarker?.properties?.singleBusinessPermits.map((store, index) => {
+                                let borderColor;
+                                if (store.payment_status === 'Paid') {
+                                    borderColor = 'green';
+                                } else if (store.payment_status === 'Not Paid') {
+                                    borderColor = 'red';
+                                } else if (store.payment_status === 'Partially Paid') {
+                                    borderColor = 'gold';
+                                } else {
+                                    borderColor = 'teal';
+                                }
+                                return (
+                                    <ListItem
+                                        key={index}
+                                        sx={{
+                                            marginBottom: '10px',
+                                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                            border: `2px solid ${borderColor}`,
+                                            borderRadius: '2px',
+                                        }}
+                                        onClick={() => handleToggleChat(index, store)}
+                                    >
+                                        <div>
+                                            <ListItemText
+                                                secondary={`Store # - ${store.store_no} - ${store.payment_status}`}
+                                                primary={`${store.business_name}->${store.business_category}`}
+                                                sx={{
+                                                    fontSize: '12px',
+                                                }}
+                                            />
+                                        </div>
+                                    </ListItem>
+                                )
+                            })
+                        )}
+                </List>
+            </Grid>
+            <Grid item xs={6} sx={{ position: "fixed", top: 3, right: 9 }} width={320}>
+                <Card sx={{ marginBottom: '-16px', }}>
+                    <ListItem sx={{ marginBottom: '-5px', }}>
+                        <ListItemText sx={{
+                            fontSize: '6px',
+                            fontStyle: 'bold'
+
+                        }} primary={`STORE INFO`} />
+                    </ListItem>
+                    {/* <ListItem sx={{ marginBottom: '-20px', }}>
+                        <ListItemText sx={{
+                            fontSize: '8px',
+
+                        }} primary={`NP-${paymentdistribution?.notPaid} : PP-${paymentdistribution?.partiallyPaid} : P-${paymentdistribution?.paid}`} />
+                    </ListItem> */}
+                    {/* <ListItem>
+                        <ListItemText sx={{
+                            fontSize: '8px',
+                        }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
+                    </ListItem> */}
+                </Card>
+                <br />
+
+                {currentstore && (
+                    <>
+                        <Card>
+                            {/* <ListItem sx={{  }}>
+                                <ListItemText sx={{
+                                    fontSize: '6px',
+                                    fontStyle: 'bold'
+
+                                }} primary={`STORE INFO`} />
+                            </ListItem> */}
+                            <ListItem sx={{}}>
+                                <ListItemText sx={{
+                                    fontSize: '6px',
+                                    fontStyle: 'bold'
+
+                                }} secondary={`APPLICATION TYPE: ${currentstore.application_type}`} />
+                            </ListItem>
+                            <ListItem sx={{}}>
+                                <ListItemText sx={{
+                                    fontSize: '6px',
+                                    fontStyle: 'bold'
+
+                                }} secondary={`BRANCH NAME: ${currentstore.branch_name}`} />
+                            </ListItem>
+                            <ListItem sx={{}}>
+                                <ListItemText sx={{
+                                    fontSize: '6px',
+                                    fontStyle: 'bold'
+
+                                }} secondary={`DESCRIPTION: ${currentstore.business_description}`} />
+                            </ListItem>
+                        </Card>
+                        <br />
+                        <Card>
+                            <ListItem sx={{}}>
+                                <ListItemText sx={{
+                                    fontSize: '6px',
+                                    fontStyle: 'bold'
+
+                                }} secondary={`Message Officer`} />
+                            </ListItem>
+                            <TextareaAutosize
+                                rows={4}
+                                placeholder="..."
+                                style={{
+                                    maxWidth: '800px',
+                                    resize: 'vertical',
+                                    borderRadius: '2px',
+                                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                                    border: `1px solid teal`,
+                                    margin: '8px',
+                                    padding: '8px'
+                                }}
+                                value={message}
+                                onKeyDown={handleKeyDown}
+                                onChange={handleMessage}
+                            />
+                        </Card>
+                    </>
                 )
-            })}
-        </List>
+                }
+
+            </Grid>
+        </Grid>
     )
 }
 

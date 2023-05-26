@@ -16,37 +16,58 @@ const MapView = ({ markers }) => {
     const selectedMarkerRef = useRef();
     const [selectedMarker, setSelectedMarker] = useState();
     const [directions, setDirections] = useState(null);
-    const [viewport, setViewport] = useState({
-        latitude: -1.2717167,
-        longitude: 36.8139821,
-        zoom: 10
-    });
+    const [viewport, setViewport] = useState();
     const MAPBOX_TOKEN = 'pk.eyJ1Ijoid2VzbGV5MjU0IiwiYSI6ImNsMzY2dnA0MDAzem0zZG8wZTFzc3B3eG8ifQ.EVg7Sg3_wpa_QO6EJjj9-g'
+    const mapRef = useRef();
 
     const directionsClient = MapboxDirections({
         accessToken: MAPBOX_TOKEN,
     });
+
+    function calculateMapCenter(objects) {
+        let totalLatitude = 0;
+        let totalLongitude = 0;
+      
+        for (const obj of objects) {
+          const latitude = parseFloat(obj.properties.latitude);
+          const longitude = parseFloat(obj.properties.longitude);
+          totalLatitude += latitude;
+          totalLongitude += longitude;
+        }
+        const centerLatitude = totalLatitude / objects.length;
+        const centerLongitude = totalLongitude / objects.length;
+      
+        return { latitude: centerLatitude, longitude: centerLongitude };
+      }
+      
 
     const paymentStatusColors = {
         "Paid": "green",
         "Partially Paid": "yellow",
         "Not Paid": "red",
         "No Occupants": "blue"
-      };
+    };
+
+    useEffect(()=>{
+        buildings && setViewport({
+            latitude: calculateMapCenter(buildings).latitude,
+            longitude: calculateMapCenter(buildings).longitude,
+            zoom: 15
+        })
+    },[buildings])
 
     useEffect(() => {
         if (userLocation) {
-            setViewport((prevState) => ({
-                ...prevState,
-                latitude: userLocation.latitude,
-                longitude: userLocation.longitude,
-                zoom: 12,
-            }));
+            // setViewport((prevState) => ({
+            //     ...prevState,
+            //     latitude: userLocation.latitude,
+            //     longitude: userLocation.longitude,
+            //     zoom: 12,
+            // }));
         }
     }, [userLocation]);
 
     useEffect(() => {
-        // console.log(buildings)
         getUserLocation();
     }, []);
 
@@ -86,6 +107,24 @@ const MapView = ({ markers }) => {
     const handleClosePopup = () => {
         setSelectedMarker(null);
     };
+
+    useEffect(() => {
+        const handleMapClick = (event) => {
+          const { target } = event;
+          const popupContainer = mapRef.current && mapRef.current.querySelector('.mapboxgl-popup');
+    
+          if (popupContainer && !popupContainer.contains(target)) {
+            // Click occurred outside of Popup, close it
+            handleClosePopup();
+          }
+        };
+    
+        document.addEventListener('click', handleMapClick);
+    
+        return () => {
+          document.removeEventListener('click', handleMapClick);
+        };
+      }, []);
 
     useEffect(() => {
         selectedMarkerRef.current = selectedMarker;
@@ -164,27 +203,32 @@ const MapView = ({ markers }) => {
                 </Marker>
             )}
 
-            {mapType === "Markers" ? (buildings?.filter(el => el.properties.paymentstatus === "Paid").map((marker, index) =>
-            (
-                <Marker key={index} latitude={marker.properties.latitude} longitude={marker.properties.longitude} anchor="bottom">
-                    <img
-                        onClick={() => handleSelected(marker)}
-                        style={{
-                            height: "15px",
-                            width: "14px",
-                            cursor: "pointer",
-                            // backgroundColor: marker.properties.paymentstatus === "Paid" ? "green" : marker.properties.paymentstatus === "Partially Paid" ? "yellow" : marker.properties.paymentstatus === "Not Paid" ? "red" : "grey", borderRadius: "50px"
-                            backgroundColor: paymentStatusColors[marker.properties.paymentstatus],
-                            borderRadius: "50px"
-                        }}
-                        src={MapMarker} alt="mapmarker" />
-                </Marker>
-            ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: buildings }}>
-                <Layer style={{ cursor: 'pointer' }}  {...heatmapLayer} onClick={(e) => {
-                    const marker = e.features[0];
-                    handleSelected(marker)
-                }} interactive={true} />
-            </Source>) : (<></>)
+            {mapType === "Markers" ? (buildings?.filter(
+                (el) => {
+                    return el.properties.paymentstatus === "Paid" ||
+                        el.properties.paymentstatus === "Partially Paid" ||
+                        el.properties.paymentstatus === "Not Paid" 
+                }).map((marker, index) =>
+                (
+                    <Marker key={index} latitude={marker.properties.latitude} longitude={marker.properties.longitude} anchor="bottom">
+                        <img
+                            onClick={() => handleSelected(marker)}
+                            style={{
+                                height: "15px",
+                                width: "14px",
+                                cursor: "pointer",
+                                // backgroundColor: marker.properties.paymentstatus === "Paid" ? "green" : marker.properties.paymentstatus === "Partially Paid" ? "yellow" : marker.properties.paymentstatus === "Not Paid" ? "red" : "grey", borderRadius: "50px"
+                                backgroundColor: paymentStatusColors[marker.properties.paymentstatus],
+                                borderRadius: "50px"
+                            }}
+                            src={MapMarker} alt="mapmarker" />
+                    </Marker>
+                ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: buildings }}>
+                    <Layer style={{ cursor: 'pointer' }}  {...heatmapLayer} onClick={(e) => {
+                        const marker = e.features[0];
+                        handleSelected(marker)
+                    }} interactive={true} />
+                </Source>) : (<></>)
             }
 
             {selectedMarker && (
@@ -195,6 +239,7 @@ const MapView = ({ markers }) => {
                     onClose={handleClosePopup}
                     closeButton={true}
                     closeOnClick={false}
+                    style={{maxWidth: "700px", maxHeight: "500px", overflow:"auto", backgroundColor:"rgba(0, 188, 212, 0.2)"}}
                 >
                     <PopupDetails selectedMarker={selectedMarker} />
                 </Popup>

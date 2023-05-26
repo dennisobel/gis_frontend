@@ -13,15 +13,16 @@ const Geography = () => {
   const dispatch = useDispatch()
   const searchQuery = useSelector(state => state.global.searchQuery)
   const mapData = useSelector(state => state.global.mapData)
+  const buildings = useSelector(state => state.global.buildings)
   const theme = useTheme();
   const [user, setUser] = useState()
   const [county, setCounty] = useState()
   const [countyBuildings, setCountyBuildings] = useState()
 
-  // const markers = buildingsdata.features;
-
   const [markers, setMarkers] = useState([])
   const [filteredMarkers, setFilteredMarkers] = useState([...markers])
+  const [filteredBuildings,setFilteredBuildings] = useState()
+
   function renameObjectKeys(array, keyMap) {
     const newArray = [];
 
@@ -73,9 +74,9 @@ const Geography = () => {
     dispatch(setActivePage("geography"))
   }, []);
 
-  useEffect(()=>{
-    dispatch(setBuildings(countyBuildings))
-  },[countyBuildings])
+  // useEffect(() => {
+  //   dispatch(setBuildings(countyBuildings))
+  // }, [countyBuildings])
 
   useEffect(() => {
     if (user) {
@@ -93,6 +94,7 @@ const Geography = () => {
   }, [user]);
 
   useEffect(() => {
+    console.log(buildings)
     if (county) {
       const fetchBuildings = async () => {
         try {
@@ -105,11 +107,8 @@ const Geography = () => {
           }
           const renamed = renameObjectKeys(data, keyMap)
           const mapped = renamed.map((obj) => {
-            // console.log(obj)
             const paymentDistribution = getPaymentStatusDistribution(obj?.singleBusinessPermits)
-            const { latitude, longitude, ...properties } = obj;            
-            // console.log(paymentDistribution)
-            // console.log(obj?.singleBusinesPermits)
+            const { latitude, longitude, ...properties } = obj;
             let payment_status
             if (paymentDistribution == "notPaid") {
               payment_status = "Not Paid"
@@ -136,8 +135,9 @@ const Geography = () => {
             };
           });
 
-          console.log(mapped)
+          // console.log(mapped)
           setCountyBuildings(mapped)
+          setFilteredBuildings(mapped)
         } catch (error) {
           console.log("Error fetching buildings:", error);
         }
@@ -172,41 +172,52 @@ const Geography = () => {
     if (searchQuery === "") {
       setFilteredMarkers(markers)
     }
-    let filtered = markers.filter(marker => {
-      if (marker.properties.subcounty.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.subcounty.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const filtered = countyBuildings?.filter((obj) => {
+      const { streetname, buildingNumber, subcounty, typeofstructure, ward, paymentstatus, singleBusinessPermits } = obj.properties
+      const filteredObj = { streetname, buildingNumber, subcounty, typeofstructure, paymentstatus, ward };
+
+      const filteredPermits = singleBusinessPermits?.filter((permit) => {
+        const { business_category, is_building_open, store_no } = permit;
+        const permitObj = { business_category, is_building_open, store_no };
+
+        for (const key in permitObj) {
+          if (permitObj[key].toString().toLowerCase().includes(searchQuery.toLowerCase())) {
+            return true;
+          }
+        }
+        return false;
+      });
+
+      for (const key in filteredObj) {
+        if (filteredObj[key]?.toString().toLowerCase().includes(searchQuery.toLowerCase())) {
+          return true;
+        }
       }
 
-      if (marker.properties.ward.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.ward.toLowerCase().includes(searchQuery.toLowerCase())
+      if (filteredPermits?.length > 0) {
+        return true;
       }
 
-      if (marker.properties.streetname.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.streetname.toLowerCase().includes(searchQuery.toLowerCase())
-      }
+      return false;
+    });
 
-      if (marker.properties.buildingnumber.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.buildingnumber.toLowerCase().includes(searchQuery.toLowerCase())
-      }
+    setFilteredBuildings(filtered)
+  }, [searchQuery,countyBuildings])
 
-      if (marker.properties.paymentstatus.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.paymentstatus.toLowerCase() === searchQuery.toLowerCase()
-      }
+  useEffect(() => {
+    console.log("FILTERED:",filteredBuildings)
+    dispatch(setBuildings(filteredBuildings))
+  },[filteredBuildings])
 
-      if (marker.properties.typeofstructure.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return marker.properties.typeofstructure.toLowerCase().includes(searchQuery.toLowerCase())
-      }
-    })
 
-    setFilteredMarkers(filtered)
-  }, [searchQuery])
 
 
   return (
     <React.Fragment>
       {/* <MapView markers={filteredMarkers} /> */}
-      {countyBuildings && <MapView markers={countyBuildings} />}
-      
+      <MapView/>
+
     </React.Fragment>
   );
 };

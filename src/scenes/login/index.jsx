@@ -3,18 +3,13 @@ import {
   TextField,
   Card,
   Button,
-  InputLabel,
-  Select,
-  MenuItem,
+  InputLabel
 } from "@mui/material";
 import validator from "validator";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setLogin } from "state";
 import { verifyPassword } from '../../helper/helper'
 
 const LoginForm = () => {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [formValues, setFormValues] = useState({
     email: "",
@@ -27,14 +22,6 @@ const LoginForm = () => {
     password: false,
     role: false,
   });
-
-  const options = [
-    { value: "management", label: "County Management" },
-    { value: "governor", label: "Governor" },
-    { value: "cec", label: "CEC" },
-    { value: "director", label: "Director" },
-    { value: "revenueOfficer", label: "Revenue Officer" },
-  ];
 
   const handleChange = (e) => {
     setFormValues({
@@ -59,7 +46,6 @@ const LoginForm = () => {
       loginPromise.then(res => {
         let { token } = res.data;
         localStorage.setItem('token', token);
-        // dispatch(setLogin(formValues))
         navigate('/otp')
       })
     }
@@ -95,22 +81,6 @@ const LoginForm = () => {
           helperText={formErrors.kra && "Please enter your password"}
         />
 
-        {/* <InputLabel id="select-label">Select a Role</InputLabel> */}
-        {/* <Select
-          size="small"
-          name="role"
-          required
-          fullWidth
-          margin="normal"
-          value={formValues.role}
-          onChange={handleChange}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select> */}
         <p style={{ textAlign: "center", marginTop: "1rem" }}>
           You don't have an account? <a href="/">Sign Up</a>
         </p>

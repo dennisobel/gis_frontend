@@ -35,6 +35,7 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
   const handleMapDataClose = () => setDataAnchorEl(null);
   const activePage = useSelector((state) => state.global.activePage);
   const login = useSelector(state => state.global.login)
+  const countyBuildings = useSelector(state => state.global.buildings)
   const [query, setQuery] = useState()
 
   const [animationStyle, setAnimationStyle] = useState({});
