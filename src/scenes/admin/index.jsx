@@ -12,8 +12,7 @@ import {
   Delete,
 } from "@mui/icons-material";
 import { useEffect } from "react";
-import { getUsers } from "helper/helper";
-import { updateUser } from "helper/helper";
+import { getUsers,updateUser,getOfficers,getUsername } from "helper/helper";
 import { useSelector } from "react-redux";
 
 const Admin = () => {
@@ -26,17 +25,20 @@ const Admin = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [rows, setRows] = useState();
-  const user = useSelector(state => state.global.login)
+  // const user = useSelector(state => state.global.login)
+  const [user,setUser] = useState()
 
   useEffect(() => {
-    getUsers()
-      .then(({ data }) => {
-        const countyOfficers = data.filter((el) => {
-          return el.role === "revenueOfficer" && el.county_id === user.county_id
-        })
-        setRows(countyOfficers);
-      })
+    getUsername().then(user => {
+      setUser(user)
+    })
   }, [])
+
+  useEffect(()=>{
+    user !==undefined && getOfficers({county:user?.county_id, role:"revenueOfficer"}).then(({data}) => {
+      setRows(data)
+    })
+  },[user])
 
   const handleOpen = () => {
     setOpen(true);

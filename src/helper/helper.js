@@ -42,6 +42,16 @@ export async function getUsers() {
   }
 }
 
+/**get officers */
+export async function getOfficers({county,role}){
+  try {
+    const data = await axios.get(`/auth/officers/${county}/${role}`)
+    return data
+  } catch (error) {
+    return { error: "Users not found" };
+  }
+}
+
 /** register user function */
 export async function registerUser(credentials) {
   try {
