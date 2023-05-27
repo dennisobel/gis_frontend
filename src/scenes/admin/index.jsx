@@ -25,7 +25,7 @@ const Admin = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [rows, setRows] = useState();
-  // const user = useSelector(state => state.global.login)
+
   const [user,setUser] = useState()
 
   useEffect(() => {

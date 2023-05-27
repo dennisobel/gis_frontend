@@ -4,43 +4,53 @@ import { useGetCustomersQuery } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
+import { getCountyBusiness, getUsername} from "helper/helper";
 
 const Customers = () => {
   const theme = useTheme();
   const { data, isLoading } = useGetCustomersQuery();
   const login = useSelector(state => state.global.login)
+  const [user,setUser] = useState()
+  const [searchInput, setSearchInput] = useState("");
+  const [rows, setRows] = useState();
 
   const [columns,setColumns] = useState([
     {
-      field: "_id",
-      headerName: "ID",
-      flex: 1,
-    },
-    {
-      field: "name",
-      headerName: "Name",
+      field: "branch_name",
+      headerName: "Branch",
       flex: 0.5,
     },
     {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
+      field: "building_name",
+      headerName: "Building",
+      flex: 0.5,
     },
     {
-      field: "phoneNumber",
+      field: "business_email",
+      headerName: "Email",
+      flex: 0.5,
+    },
+    {
+      field: "business_phone",
       headerName: "Phone Number",
       flex: 0.5,
-      renderCell: (params) => {
-        return params.value.replace(/^(\d{3})(\d{3})(\d{4})/, "($1)$2-$3");
-      },
     },
 
     {
-      field: "occupation",
-      headerName: "Business",
-      flex: 1,
+      field: "payment_status",
+      headerName: "Compliance",
+      flex: 0.5,
     },
   ]);
+
+  useEffect(()=>{
+    getUsername().then(res => setUser(res))
+  },[])
+
+  useEffect(() => {
+    user !== undefined && getCountyBusiness({county:user?.county_id}).then(({data}) => setRows(data))
+  }, [user])
+  
 
   useEffect(() => {
     login.role === "management" && setColumns([...columns,{
@@ -82,9 +92,9 @@ const Customers = () => {
         }}
       >
         <DataGrid
-          loading={isLoading || !data}
+          loading={isLoading || !rows}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={rows || []}
           columns={columns}
         />
       </Box>

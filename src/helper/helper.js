@@ -214,6 +214,16 @@ export async function createBusiness(body) {
     }
   }
 
+    /** get business */
+    export async function getCountyBusiness({ county }) {
+      try {
+        const { data } = await axios.get(`/business/businesses/${county}`);
+        return { data };
+      } catch (error) {
+        return { error };
+      }
+    }
+
   /** get businesses by building id */
   export async function getBuildingStores(id) {
     try {
