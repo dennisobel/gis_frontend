@@ -81,10 +81,6 @@ const SignUpForm = () => {
     setFormErrors(errors);
 
     if (!Object.values(errors).some(Boolean)) {
-      // axios.post("https://gis.affordit.co.ke/users", formValues)
-      // .then(res => {
-      //   console.log("CREATE USER:",res)
-      // })
       let registerPromise = registerUser(formValues)
       dispatch(setSignup(formValues))
       registerPromise.then(function () { navigate('/login') });
