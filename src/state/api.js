@@ -33,6 +33,14 @@ export const api = createApi({
             }),
             providesTags: ["SingleBusinessPermits"],
         }),
+        getCountyBuildings: build.query({
+            query: ({county, category}) => ({
+                url: `buildings/by-county/${county}`,
+                method: "GET",
+                params: {category}
+            }),
+            providesTags: ["Buildings"]
+        }),
         getGeography: build.query({
             query: () => "client/geography",
             providesTags: ["Geography"],
@@ -84,6 +92,7 @@ export const {
     useGetAdminsQuery,
     useGetUserPerformanceQuery,
     useGetDashboardQuery,
-    useGetCountyBusinesesQuery
+    useGetCountyBusinesesQuery,
+    useGetCountyBuildingsQuery
 } = api;
 

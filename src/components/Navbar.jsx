@@ -9,6 +9,8 @@ import FlexBetween from "components/FlexBetween";
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setSearchQuery, setMapType, setMapData } from "state";
 import profileImage from "assets/profile.jpg";
+import { setCountyBuildings } from "state";
+import { getUsername, getCounty, getCountyBuildings } from "helper/helper";
 import {
   AppBar,
   Button,
@@ -38,9 +40,68 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
   const countyBuildings = useSelector(state => state.global.buildings)
   const [query, setQuery] = useState()
 
+
   const [animationStyle, setAnimationStyle] = useState({});
   const mapType = ["Markers", "Clusters"]
   const mapData = ["Buildings", "Stores"]
+
+  const [loggeduser, setUser] = useState()
+  const [county, setCounty] = useState()
+  const [buildings, setBuildings] = useState()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUsername();
+        setUser(res);
+      } catch (error) {
+        console.log("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    console.log("user:",loggeduser)
+    if (loggeduser) {
+      const fetchCounty = async () => {
+        try {
+          const { data } = await getCounty(loggeduser.county_id)
+          
+          setCounty(data[0].name)
+          // const buildings = await getCountyBuildings(data[0]?.name)
+          // console.log("COUNTY BUILDINGS:", buildings)
+        } catch (error) {
+          console.log("Error fetching county:", error);
+        }
+      }
+
+      fetchCounty()
+    }
+  }, [loggeduser])
+
+  useEffect(() => {
+    if(county){
+      const fetchBuildings = async () => {
+        try {
+          // const {data} = await getCountyBuildings({county, category:query})
+          const {data} = await getCountyBuildings({ county, ...(query !== '' && { category: query }) });
+
+          setBuildings(data)
+        } catch (error) {
+          console.log("Error fetching buildings:", error);
+        }
+      }
+
+      fetchBuildings()
+    }
+    
+  }, [county,query])
+
+  useEffect(() => {
+    buildings !== undefined && dispatch(setCountyBuildings(buildings))
+  },[buildings,dispatch])
 
   useEffect(() => {
     setAnimationStyle({ animation: 'shimmer 2s infinite' });

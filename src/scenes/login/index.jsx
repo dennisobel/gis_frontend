@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Card,
@@ -7,10 +7,18 @@ import {
 } from "@mui/material";
 import validator from "validator";
 import { useNavigate } from "react-router-dom";
-import { verifyPassword } from '../../helper/helper'
+import { getUsername, verifyPassword, getCounty } from '../../helper/helper'
+import { useDispatch,useSelector } from "react-redux";
+import { setLoggedCounty, setLoggedUser } from "state";
 
 const LoginForm = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
+  const user = useSelector(state => state.global.user)
+
+  useEffect(()=>{
+    user !== undefined && getCounty(user?.county_id).then(res => dispatch(setLoggedCounty(res)))
+  },[])
   const [formValues, setFormValues] = useState({
     email: "",
     password: "",
@@ -48,6 +56,8 @@ const LoginForm = () => {
         localStorage.setItem('token', token);
         navigate('/otp')
       })
+      .then(getUsername().then(res => dispatch(setLoggedUser(res))))
+      .then()
     }
   };
 

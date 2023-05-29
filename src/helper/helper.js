@@ -170,6 +170,16 @@ export async function getBuildingById({ _id }) {
   }
 }
 
+/** get building */
+export async function getAllBuildingStores({ _id }) {
+  try {
+    const { data } = await axios.get(`/buildings/${_id}`);
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+}
+
 /** get buildings */
 export async function getAllCountyBuildings(county) {
   try {
@@ -217,7 +227,7 @@ export async function createBusiness(body) {
     /** get business */
     export async function getCountyBusiness({ page, pageSize, sort, search, county }) {
       try {
-        const { data } = await axios.get(`/business/businesses/${county}`,{
+        const { data } = await axios.get(`/business/county-businesses/${county}`,{
           params: { page, pageSize, sort, search }
         });
         return { data };
@@ -268,6 +278,18 @@ export async function createBusiness(body) {
         return { error: "County not found" };
     }
    }
+
+      /**Get county buildings */
+      export async function getCountyBuildings({county, category}) {
+        try {
+            const buildings = await axios.get(`/buildings/by-county/${county}`, category !== "" && {
+              params: {category}
+            })
+            return buildings
+        } catch (error) {
+            return { error: "County not found" };
+        }
+       }
 
    /**Send Message */
    export async function sendMail({to,from,name,email_body}) {

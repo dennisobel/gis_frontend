@@ -7,9 +7,11 @@ import PopupDetails from './PopupDetails';
 import MapboxDirections from '@mapbox/mapbox-sdk/services/directions'
 import polyline from '@mapbox/polyline';
 import * as turf from '@turf/turf'
+import { getAllBuildingStores } from 'helper/helper';
 
 const MapView = ({ markers }) => {
-    const buildings = useSelector(state => state.global.buildings)
+    // const buildings = useSelector(state => state.global.buildings)
+    const buildings = useSelector(state => state.global.countybuildings)
     const [userLocation, setUserLocation] = useState(null);
     const mapType = useSelector(state => state.global.mapType)
     const MapMarker = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9c0 6 7 13 7 13s7-7 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /%3E%3C/svg%3E'
@@ -29,8 +31,8 @@ const MapView = ({ markers }) => {
         let totalLongitude = 0;
       
         for (const obj of objects) {
-          const latitude = parseFloat(obj.properties.latitude);
-          const longitude = parseFloat(obj.properties.longitude);
+          const latitude = parseFloat(obj.latitude);
+          const longitude = parseFloat(obj.longitude);
           totalLatitude += latitude;
           totalLongitude += longitude;
         }
@@ -88,20 +90,27 @@ const MapView = ({ markers }) => {
     };
 
     const handleSelected = async (marker) => {
-        setSelectedMarker((prevMarker) => prevMarker === marker ? null : marker);
-        const origin = [userLocation.longitude, userLocation.latitude];
-        const destination = [marker?.properties?.longitude, marker?.properties?.latitude];
-        const response = await directionsClient.getDirections({
-            profile: 'driving',
-            waypoints: [
-                { coordinates: origin },
-                { coordinates: destination }
-            ],
-            steps: true,
-        }).send();
-        const coordinates = polyline.decode(response.body.routes[0].geometry)
-        const line = turf.lineString(coordinates);
-        setDirections(line)
+        // console.log("marker:",marker)
+        getAllBuildingStores({_id:marker._id}).then(({data})=>{
+            // console.log("res:",data)
+            setSelectedMarker(data)
+        })
+
+
+        // setSelectedMarker((prevMarker) => prevMarker === marker ? null : marker);
+        // const origin = [userLocation.longitude, userLocation.latitude];
+        // const destination = [marker?.longitude, marker?.latitude];
+        // const response = await directionsClient.getDirections({
+        //     profile: 'driving',
+        //     waypoints: [
+        //         { coordinates: origin },
+        //         { coordinates: destination }
+        //     ],
+        //     steps: true,
+        // }).send();
+        // const coordinates = polyline.decode(response.body.routes[0].geometry)
+        // const line = turf.lineString(coordinates);
+        // setDirections(line)
     };
 
     const handleClosePopup = () => {
@@ -163,7 +172,7 @@ const MapView = ({ markers }) => {
         type: 'heatmap',
         source: {
             type: 'geojson',
-            data: buildings
+            data: buildings && buildings
         },
         paint: {
             'heatmap-opacity': 0.8,
@@ -203,27 +212,22 @@ const MapView = ({ markers }) => {
                 </Marker>
             )}
 
-            {mapType === "Markers" ? (buildings?.filter(
-                (el) => {
-                    return el.properties.paymentstatus === "Paid" ||
-                        el.properties.paymentstatus === "Partially Paid" ||
-                        el.properties.paymentstatus === "Not Paid" 
-                }).map((marker, index) =>
+            {mapType === "Markers" ? (buildings?.map((marker, index) =>
                 (
-                    <Marker key={index} latitude={marker.properties.latitude} longitude={marker.properties.longitude} anchor="bottom">
+                    <Marker key={index} latitude={marker.latitude} longitude={marker.longitude} anchor="bottom">
                         <img
                             onClick={() => handleSelected(marker)}
                             style={{
                                 height: "15px",
                                 width: "14px",
                                 cursor: "pointer",
-                                // backgroundColor: marker.properties.paymentstatus === "Paid" ? "green" : marker.properties.paymentstatus === "Partially Paid" ? "yellow" : marker.properties.paymentstatus === "Not Paid" ? "red" : "grey", borderRadius: "50px"
-                                backgroundColor: paymentStatusColors[marker.properties.paymentstatus],
+                                // backgroundColor: marker.paymentstatus === "Paid" ? "green" : marker.paymentstatus === "Partially Paid" ? "yellow" : marker.paymentstatus === "Not Paid" ? "red" : "grey", borderRadius: "50px"
+                                backgroundColor: paymentStatusColors[marker.payment_status],
                                 borderRadius: "50px"
                             }}
                             src={MapMarker} alt="mapmarker" />
                     </Marker>
-                ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: buildings }}>
+                ))) : mapType === "Clusters" ? (<Source type="geojson" data={{ type: 'FeatureCollection', features: buildings && buildings }}>
                     <Layer style={{ cursor: 'pointer' }}  {...heatmapLayer} onClick={(e) => {
                         const marker = e.features[0];
                         handleSelected(marker)
@@ -233,8 +237,8 @@ const MapView = ({ markers }) => {
 
             {selectedMarker && (
                 <Popup
-                    latitude={selectedMarker.properties.latitude}
-                    longitude={selectedMarker.properties.longitude}
+                    latitude={selectedMarker.latitude}
+                    longitude={selectedMarker.longitude}
                     anchor="top-left"
                     onClose={handleClosePopup}
                     closeButton={true}

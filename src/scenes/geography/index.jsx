@@ -19,7 +19,7 @@ const Geography = () => {
 
   const [markers, setMarkers] = useState([])
   const [filteredMarkers, setFilteredMarkers] = useState([...markers])
-  const [filteredBuildings,setFilteredBuildings] = useState()
+  const [filteredBuildings, setFilteredBuildings] = useState()
 
   function renameObjectKeys(array, keyMap) {
     const newArray = [];
@@ -93,61 +93,62 @@ const Geography = () => {
 
   useEffect(() => {
     console.log(buildings)
-    if(buildings?.length === 0)
-{    if (county) {
-      const fetchBuildings = async () => {
-        try {
-          const { data } = await getAllCountyBuildings(county)
-          const keyMap = {
-            building_number: "buildingNumber",
-            street: "streetname",
-            sub_county: "subcounty",
-            type_of_structure: "typeofstructure"
-          }
-          const renamed = renameObjectKeys(data, keyMap)
-          const mapped = renamed.map((obj) => {
-            const paymentDistribution = getPaymentStatusDistribution(obj?.singleBusinessPermits)
-            const { latitude, longitude, ...properties } = obj;
-            let payment_status
-            if (paymentDistribution == "notPaid") {
-              payment_status = "Not Paid"
-            } else if (paymentDistribution == "partiallyPaid") {
-              payment_status = "Partially Paid"
-            } else if (paymentDistribution == "paid") {
-              payment_status = "Paid"
-            } else if (paymentDistribution == "No Occupants") {
-              payment_status = "No Occupants"
+    if (buildings?.length === 0) {
+      if (county) {
+        const fetchBuildings = async () => {
+          try {
+            const { data } = await getAllCountyBuildings(county)
+            const keyMap = {
+              building_number: "buildingNumber",
+              street: "streetname",
+              sub_county: "subcounty",
+              type_of_structure: "typeofstructure"
             }
-
-            return {
-              type: "Feature",
-              properties: {
-                ...properties,
-                latitude,
-                longitude,
-                paymentstatus: payment_status
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [longitude, latitude]
+            const renamed = renameObjectKeys(data, keyMap)
+            const mapped = renamed.map((obj) => {
+              const paymentDistribution = getPaymentStatusDistribution(obj?.singleBusinessPermits)
+              const { latitude, longitude, ...properties } = obj;
+              let payment_status
+              if (paymentDistribution == "notPaid") {
+                payment_status = "Not Paid"
+              } else if (paymentDistribution == "partiallyPaid") {
+                payment_status = "Partially Paid"
+              } else if (paymentDistribution == "paid") {
+                payment_status = "Paid"
+              } else if (paymentDistribution == "No Occupants") {
+                payment_status = "No Occupants"
               }
-            };
-          });
 
-          // console.log(mapped)
-          setCountyBuildings(mapped)
-          setFilteredBuildings(mapped)
-        } catch (error) {
-          console.log("Error fetching buildings:", error);
+              return {
+                type: "Feature",
+                properties: {
+                  ...properties,
+                  latitude,
+                  longitude,
+                  paymentstatus: payment_status
+                },
+                geometry: {
+                  type: "Point",
+                  coordinates: [longitude, latitude]
+                }
+              };
+            });
+
+            // console.log(mapped)
+            setCountyBuildings(mapped)
+            setFilteredBuildings(mapped)
+          } catch (error) {
+            console.log("Error fetching buildings:", error);
+          }
         }
-      }
 
-      fetchBuildings()
-    }}
+        // fetchBuildings()
+      }
+    }
   }, [county])
 
   useEffect(() => {
-    console.log("BUILDINGS:",buildings)
+    console.log("BUILDINGS:", buildings)
     const fetchUser = async () => {
       try {
         const res = await getUsername();
@@ -203,12 +204,12 @@ const Geography = () => {
     });
 
     setFilteredBuildings(filtered)
-  }, [searchQuery,countyBuildings])
+  }, [searchQuery, countyBuildings])
 
   useEffect(() => {
-    console.log("FILTERED:",filteredBuildings)
+    console.log("FILTERED:", filteredBuildings)
     filteredBuildings !== undefined && dispatch(setBuildings(filteredBuildings))
-  },[filteredBuildings])
+  }, [filteredBuildings])
 
 
 
@@ -216,7 +217,7 @@ const Geography = () => {
   return (
     <React.Fragment>
       {/* <MapView markers={filteredMarkers} /> */}
-      <MapView/>
+      <MapView />
 
     </React.Fragment>
   );

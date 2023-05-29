@@ -6,7 +6,7 @@ import CustomColumnMenu from "components/DataGridCustomColumnMenu";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import { DataGrid } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
-import { getCountyBusiness, getUsername } from "helper/helper";
+import { getCountyBusiness, getUsername, getCounty } from "helper/helper";
 
 const Customers = () => {
   const theme = useTheme();
@@ -19,6 +19,8 @@ const Customers = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+  const [county,setCounty] = useState()
+  const [businesses,setCountyBusinesses] = useState()
 
   const [searchInput, setSearchInput] = useState("");
   const { data, isLoading } = useGetCountyBusinesesQuery({
@@ -28,8 +30,6 @@ const Customers = () => {
     search,
     county: user?.county_id
   });
-
-  console.log("DATA:", data)
 
   const [rows, setRows] = useState();
 
@@ -42,11 +42,6 @@ const Customers = () => {
     {
       field: "branch_name",
       headerName: "Branch",
-      flex: 0.5,
-    },
-    {
-      field: "building_name",
-      headerName: "Building",
       flex: 0.5,
     },
     {
@@ -66,32 +61,50 @@ const Customers = () => {
       flex: 0.5,
     },
   ]
+  useEffect(() => {
+    console.log("user:",user)
+    if (user) {
+      const fetchCounty = async () => {
+        try {
+          const { data } = await getCounty(user.county_id)
+          setCounty(data[0].name)
+        } catch (error) {
+          console.log("Error fetching county:", error);
+        }
+      }
+
+      fetchCounty()
+    }
+  }, [user])
 
   useEffect(() => {
-    getUsername().then(res => setUser(res))
-  }, [])
+    const fetchUser = async () => {
+      try {
+        const res = await getUsername();
+        setUser(res);
+      } catch (error) {
+        console.log("Error fetching user:", error);
+      }
+    };
 
-  // useEffect(() => {
-  //   user !== undefined && getCountyBusiness({
-  //     page,
-  //     pageSize,
-  //     sort: JSON.stringify(sort),
-  //     search,
-  //     county: user?.county_id
-  //   }).then(({ data }) => {
-  //     console.log(data)
-  //     setRows(data)
-  //   })
-  // }, [user,search,searchInput])
+    fetchUser();
+  }, []);
 
+  useEffect(() => {
+    if(county){
+      const fetchBusinesses = async () => {
+        try {
+          const {data} = await getCountyBusiness({county})
+          console.log("DATA:",data)
+          setCountyBusinesses(data)
+        } catch (error) {
+          console.log("Error fetching buildings:", error);
+        }
+      }
 
-  // useEffect(() => {
-  //   login.role === "management" && setColumns([...columns, {
-  //     field: "country",
-  //     headerName: "Ward",
-  //     flex: 0.4,
-  //   }])
-  // }, [])
+      fetchBusinesses()
+    }
+  }, [county])
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -125,11 +138,11 @@ const Customers = () => {
         }}
       >
         <DataGrid
-          loading={isLoading || !data}
+          loading={isLoading || !businesses?.countyBusinesses}
           getRowId={(row) => row._id}
-          rows={data || []}
+          rows={businesses?.countyBusinesses || []}
           columns={columns}
-          rowCount={(data && data.total) || 0}
+          rowCount={(businesses?.countyBusinesses && businesses?.total) || 0}
           rowsPerPageOptions={[20, 50, 100]}
           pagination
           page={page}

@@ -22,15 +22,15 @@ function PopupDetails({ selectedMarker }) {
     const [user,setUser] = useState()
 
     useEffect(() => {
-        console.log(countyBuildings)
+        // console.log(countyBuildings)
         const selected = countyBuildings?.filter(el => {
-            return el.properties._id === selectedMarker.properties._id
+            return el.properties._id === selectedMarker._id
         })
 
-        setWard(selected[0]?.properties.ward)
-        setCounty(selected[0]?.properties.county)
+        setWard(selected[0]?.ward)
+        setCounty(selected[0]?.county)
 
-        console.log(selected)
+        console.log("selectedMarker",selectedMarker)
 
         function getPaymentStatusDistribution(permits) {
             const result = permits?.reduce((acc, permit) => {
@@ -61,7 +61,7 @@ function PopupDetails({ selectedMarker }) {
 
 
         if (selectedMarker) {
-            const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || []);
+            const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.singleBusinessPermits || []);
             setPaymentDistribution(paymentDistribution);
         }
     }, [selectedMarker])
@@ -117,10 +117,10 @@ function PopupDetails({ selectedMarker }) {
                     <ListItem>
                         <ListItemText sx={{
                             fontSize: '8px',
-                        }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
+                        }} secondary={`Building # - ${selectedMarker.buildingNumber} : Structure - ${selectedMarker.typeofstructure} : Floors - ${selectedMarker.floors || 0}`} />
                     </ListItem>
 
-                    {selectedMarker?.properties?.singleBusinessPermits
+                    {selectedMarker?.singleBusinessPermits
                         .filter((store) => {
                             const { business_category, is_building_open, store_no } = store;
                             const permitObj = { business_category, is_building_open, store_no };
@@ -171,7 +171,7 @@ function PopupDetails({ selectedMarker }) {
                         })
                     }
 
-                    {selectedMarker?.properties?.singleBusinessPermits
+                    {selectedMarker?.singleBusinessPermits
                         .filter((store) => {
                             const { business_category, is_building_open, store_no } = store;
                             const permitObj = { business_category, is_building_open, store_no };
@@ -185,7 +185,7 @@ function PopupDetails({ selectedMarker }) {
                             return false;
                         })
                         .length === 0 && (
-                            selectedMarker?.properties?.singleBusinessPermits.map((store, index) => {
+                            selectedMarker?.singleBusinessPermits.map((store, index) => {
                                 let borderColor;
                                 if (store.payment_status === 'Paid') {
                                     borderColor = 'green';
@@ -240,7 +240,7 @@ function PopupDetails({ selectedMarker }) {
                     {/* <ListItem>
                         <ListItemText sx={{
                             fontSize: '8px',
-                        }} secondary={`Building # - ${selectedMarker.properties.buildingNumber} : Structure - ${selectedMarker.properties.typeofstructure} : Floors - ${selectedMarker.properties.floors || 0}`} />
+                        }} secondary={`Building # - ${selectedMarker.buildingNumber} : Structure - ${selectedMarker.typeofstructure} : Floors - ${selectedMarker.floors || 0}`} />
                     </ListItem> */}
                 </Card>
                 <br />
