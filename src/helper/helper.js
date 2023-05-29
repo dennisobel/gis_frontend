@@ -268,3 +268,13 @@ export async function createBusiness(body) {
         return { error: "County not found" };
     }
    }
+
+   /**Send Message */
+   export async function sendMail({to,from,name,email_body}) {
+    try {
+        const res = await axios.post(`/user/send-mail/`,{to,from,name,email_body})
+        return res
+    } catch (error) {
+        return { error: "message not sent" };
+    }
+   }

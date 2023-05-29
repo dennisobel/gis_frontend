@@ -98,8 +98,8 @@ const OTPForm = () => {
 
   return (
     <>
-      <ToastContainer />
       <Card sx={{ maxWidth: 500, margin: "0 auto", mt: 5, p: 3 }}>
+      <ToastContainer />
         <form onSubmit={handleSubmit}>
           <TextField
             required

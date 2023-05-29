@@ -4,6 +4,9 @@ import {
     List, ListItem, ListItemText, TextareaAutosize, Grid, Card
 } from "@mui/material";
 import { Padding } from '@mui/icons-material';
+import { getOfficers,sendMail,getUsername } from 'helper/helper';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function PopupDetails({ selectedMarker }) {
     const countyBuildings = useSelector(state => state.global.buildings)
@@ -13,12 +16,19 @@ function PopupDetails({ selectedMarker }) {
     const [toggleChatArray, setToggleChatArray] = useState([]);
     const [selectedindex, setSelectedIndex] = useState(-1)
     const [currentstore, setCurrentStore] = useState()
+    const [ward,setWard] = useState()
+    const [county,setCounty] = useState()
+    const [officer,setOfficer] = useState()
+    const [user,setUser] = useState()
 
     useEffect(() => {
         console.log(countyBuildings)
-        const selected = countyBuildings.filter(el => {
+        const selected = countyBuildings?.filter(el => {
             return el.properties._id === selectedMarker.properties._id
         })
+
+        setWard(selected[0]?.properties.ward)
+        setCounty(selected[0]?.properties.county)
 
         console.log(selected)
 
@@ -44,11 +54,28 @@ function PopupDetails({ selectedMarker }) {
             return result
         }
 
+        getUsername().then(user => {
+            setUser(user)
+        })
+
+
+
         if (selectedMarker) {
             const paymentDistribution = getPaymentStatusDistribution(selectedMarker?.properties.singleBusinessPermits || []);
             setPaymentDistribution(paymentDistribution);
         }
     }, [selectedMarker])
+
+    useEffect(()=>{
+        let wardOfficer
+        county !== undefined && getOfficers({county,role:"revenueOfficer"}).then(({data}) => {            
+            wardOfficer = data?.filter(officer => {
+                return officer.ward === ward
+            })
+
+            console.log("officer:",wardOfficer)
+        })
+    },[ward,county])
 
     const handleToggleChat = (index, store) => {
         const newToggleChatArray = [...toggleChatArray];
@@ -63,14 +90,22 @@ function PopupDetails({ selectedMarker }) {
     }, []);
 
     const handleKeyDown = useCallback((event) => {
+        const notify = () => toast("Email sent");
+        console.log(user)
         if (event.key === 'Enter') {
             event.preventDefault();
             console.log('Message entered:', message);
+            sendMail({to:"ogembodenis2016@gmail.com", from:user.email, name: user.name, email_body:message})
+            .then((res) => {
+                console.log("RES",res)
+            })
+            .then(notify)
             setMessage(''); // Clear the message after pressing Enter
         }
     }, [message]);
     return (
         <Grid width={700} height={500} container spacing={1} sx={{ maxWidth: "700px", maxHeight: "700px" }}>
+            <ToastContainer />
             <Grid item xs={6}>
                 <List>
                     <ListItem sx={{ marginBottom: '-20px', }}>
