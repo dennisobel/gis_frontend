@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   LightModeOutlined,
   DarkModeOutlined,
@@ -7,8 +7,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setSearchQuery, setMapType, setMapData } from "state";
-import profileImage from "assets/profile.jpg";
+import { setMode, setSearchQuery, setMapType } from "state";
 import { setCountyBuildings } from "state";
 import { getUsername, getCounty, getCountyBuildings } from "helper/helper";
 import {
@@ -70,8 +69,6 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
           const { data } = await getCounty(loggeduser.county_id)
           
           setCounty(data[0].name)
-          // const buildings = await getCountyBuildings(data[0]?.name)
-          // console.log("COUNTY BUILDINGS:", buildings)
         } catch (error) {
           console.log("Error fetching county:", error);
         }
@@ -85,7 +82,6 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
     if(county){
       const fetchBuildings = async () => {
         try {
-          // const {data} = await getCountyBuildings({county, category:query})
           const {data} = await getCountyBuildings({ county, ...(query !== '' && { category: query }) });
 
           setBuildings(data)
@@ -111,6 +107,29 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
     dispatch(setSearchQuery(event.target.value));
     setQuery(event.target.value)
   };
+
+  const handleKeyDown = useCallback((event) => {
+    console.log(user)
+    // if (event.key === 'Enter') {
+    //     event.preventDefault();
+    //     if(county){
+    //       console.log("about to fetch")
+    //       const fetchBuildings = async () => {
+    //         console.log("inside fetch")
+    //         try {
+    //           const {data} = await getCountyBuildings({ county, ...(query !== '' && { category: query }) });
+    
+    //           setBuildings(data)
+    //         } catch (error) {
+    //           console.log("Error fetching buildings:", error);
+    //         }
+    //       }
+    
+    //       fetchBuildings()
+    //     }
+    // }
+}, [county]);
+
   return (
     <AppBar
       sx={{
@@ -185,7 +204,8 @@ function Navbar({ user, isSidebarOpen, setIsSidebarOpen }) {
             <IconButton className="icon" style={animationStyle} sx={{ p: "8px" }} aria-label="menu" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <MenuIcon />
             </IconButton>
-            {activePage === "geography" && <InputBase sx={{ height: "1px", width: "524px" }} placeholder="Filter subcounty, ward, street, payment status, building number, type of structure" onChange={handleInputChange} />}
+
+            {activePage === "geography" && <InputBase sx={{ height: "1px", width: "524px" }} placeholder="Filter subcounty, ward, street, payment status, building number, type of structure" onChange={handleInputChange} onKeyDown={handleKeyDown} />}
 
             <IconButton onClick={() => dispatch(setMode())}>
               {theme.palette.mode === "dark" ? (

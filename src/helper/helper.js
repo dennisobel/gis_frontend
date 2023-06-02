@@ -43,10 +43,10 @@ export async function getUsers() {
 }
 
 /**get officers */
-export async function getOfficers({county,role}){
+export async function getOfficers({ county, role }) {
   try {
-    const data = await axios.get(`/auth/officers/${county}/${role}`)
-    return data
+    const data = await axios.get(`/auth/officers/${county}/${role}`);
+    return data;
   } catch (error) {
     return { error: "Users not found" };
   }
@@ -206,97 +206,111 @@ export async function updateBuilding(building) {
 
 /** create business */
 export async function createBusiness(body) {
-    try {
-      const data = await axios.post(`/business/register`, body);
-      return Promise.resolve(data);
-    } catch (error) {
-      return Promise.reject({ error });
-    }
+  try {
+    const data = await axios.post(`/business/register`, body);
+    return Promise.resolve(data);
+  } catch (error) {
+    return Promise.reject({ error });
   }
-  
-  /** get business */
-  export async function getBusinessById({ business }) {
-    try {
-      const { data } = await axios.get(`/business/business/${business}`);
-      return { data };
-    } catch (error) {
-      return { error };
-    }
-  }
+}
 
-    /** get business */
-    export async function getCountyBusiness({ page, pageSize, sort, search, county }) {
-      try {
-        const { data } = await axios.get(`/business/county-businesses/${county}`,{
-          params: { page, pageSize, sort, search }
-        });
-        return { data };
-      } catch (error) {
-        return { error };
+/** get business */
+export async function getBusinessById({ business }) {
+  try {
+    const { data } = await axios.get(`/business/business/${business}`);
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+}
+
+/** get business */
+export async function getCountyBusiness({
+  page,
+  pageSize,
+  sort,
+  search,
+  county,
+}) {
+  try {
+    const { data } = await axios.get(`/business/county-businesses/${county}`, {
+      params: { page, pageSize, sort, search },
+    });
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+}
+
+/** get businesses by building id */
+export async function getBuildingStores(id) {
+  try {
+    const data = await axios.get(`/business/businesses/${id}`);
+    return data;
+  } catch (error) {
+    return { error: "Stores not found" };
+  }
+}
+
+/** get businesses */
+export async function getAllBusinesses() {
+  try {
+    const data = await axios.get("/business/businesses");
+    return data;
+  } catch (error) {
+    return { error: "Buildings not found" };
+  }
+}
+
+/** update business function */
+export async function updateBusiness(_id) {
+  try {
+    const token = await localStorage.getItem("token");
+    const data = await axios.put("/business/update", _id, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return Promise.resolve({ data });
+  } catch (error) {
+    return Promise.reject({ error: "Couldn't Update Building...!" });
+  }
+}
+/**Get county */
+export async function getCounty(code) {
+  try {
+    const county = await axios.get(`/county/counties/${code}`);
+    return county;
+  } catch (error) {
+    return { error: "County not found" };
+  }
+}
+
+/**Get county buildings */
+export async function getCountyBuildings({ county, category }) {
+  try {
+    const buildings = await axios.get(
+      `/buildings/by-county/${county}`,
+      category !== "" && {
+        params: { category },
       }
-    }
-
-  /** get businesses by building id */
-  export async function getBuildingStores(id) {
-    try {
-        const data = await axios.get(`/business/businesses/${id}`)
-        return data
-    } catch (error) {
-        return { error: "Stores not found" };
-    }
+    );
+    return buildings;
+  } catch (error) {
+    return { error: "County not found" };
   }
-  
-  /** get businesses */
-  export async function getAllBusinesses() {
-    try {
-      const data = await axios.get("/business/businesses");
-      return data;
-    } catch (error) {
-      return { error: "Buildings not found" };
-    }
-  }
-  
-  /** update business function */
-  export async function updateBusiness(_id) {
-    try {
-      const token = await localStorage.getItem("token");
-      const data = await axios.put("/business/update", _id, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      return Promise.resolve({ data });
-    } catch (error) {
-      return Promise.reject({ error: "Couldn't Update Building...!" });
-    }
-  }
-   /**Get county */
-   export async function getCounty(code) {
-    try {
-        const county = await axios.get(`/county/counties/${code}`)
-        return county
-    } catch (error) {
-        return { error: "County not found" };
-    }
-   }
+}
 
-      /**Get county buildings */
-      export async function getCountyBuildings({county, category}) {
-        try {
-            const buildings = await axios.get(`/buildings/by-county/${county}`, category !== "" && {
-              params: {category}
-            })
-            return buildings
-        } catch (error) {
-            return { error: "County not found" };
-        }
-       }
-
-   /**Send Message */
-   export async function sendMail({to,from,name,email_body}) {
-    try {
-        const res = await axios.post(`/user/send-mail/`,{to,from,name,email_body})
-        return res
-    } catch (error) {
-        return { error: "message not sent" };
-    }
-   }
+/**Send Message */
+export async function sendMail({ to, from, name, email_body }) {
+  try {
+    const res = await axios.post(`/user/send-mail/`, {
+      to,
+      from,
+      name,
+      email_body,
+    });
+    return res;
+  } catch (error) {
+    return { error: "message not sent" };
+  }
+}

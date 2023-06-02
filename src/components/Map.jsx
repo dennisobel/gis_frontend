@@ -17,6 +17,7 @@ const MapView = ({ markers }) => {
     const MapMarker = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9c0 6 7 13 7 13s7-7 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /%3E%3C/svg%3E'
     const selectedMarkerRef = useRef();
     const [selectedMarker, setSelectedMarker] = useState();
+    const [isVisible,setIsVisible] = useState()
     const [directions, setDirections] = useState(null);
     const [viewport, setViewport] = useState();
     const MAPBOX_TOKEN = 'pk.eyJ1Ijoid2VzbGV5MjU0IiwiYSI6ImNsMzY2dnA0MDAzem0zZG8wZTFzc3B3eG8ifQ.EVg7Sg3_wpa_QO6EJjj9-g'
@@ -57,6 +58,10 @@ const MapView = ({ markers }) => {
             zoom: 15
         })
     },[buildings])
+
+    // useEffect(()=>{
+    //     viewport.contains()
+    // },[viewport])
 
     useEffect(() => {
         if (userLocation) {
@@ -212,7 +217,7 @@ const MapView = ({ markers }) => {
                 </Marker>
             )}
 
-            {mapType === "Markers" ? (buildings?.map((marker, index) =>
+            {buildings && mapType === "Markers" ? (buildings?.map((marker, index) =>
                 (
                     <Marker key={index} latitude={marker.latitude} longitude={marker.longitude} anchor="bottom">
                         <img

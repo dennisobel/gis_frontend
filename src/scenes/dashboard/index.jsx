@@ -28,6 +28,8 @@ const Dashboard = () => {
   const { data, isLoading } = useGetDashboardQuery();
   const login = useSelector(state => state.global.login);
 
+  console.log("DASHBOARD:",data)
+
   const columns = [
     {
       field: "_id",
@@ -93,9 +95,9 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <StatBox
           title="Businesses Registered"
-          value={data && data.totalCustomers}
+          value={data && data.summary.businesses.this_year}
           increase="+14%"
-          description="Since last month"
+          description="This Year"
           icon={
             <Email
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -104,7 +106,7 @@ const Dashboard = () => {
         />
         <StatBox
           title="Revenue Today"
-          value={data && data.todayStats.totalSales}
+          value={data && data.summary.collections.today}
           increase="+21%"
           description="Since last month"
           icon={
@@ -112,7 +114,7 @@ const Dashboard = () => {
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
-        />
+        /> 
         <Box
           gridColumn="span 8"
           gridRow="span 2"
@@ -124,7 +126,7 @@ const Dashboard = () => {
         </Box>
         <StatBox
           title="Monthly Revenue"
-          value={data && data.thisMonthStats.totalSales}
+          value={data && data.summary.collections.this_week}
           increase="+5%"
           description="Since last month"
           icon={
@@ -135,7 +137,7 @@ const Dashboard = () => {
         />
         <StatBox
           title="Yearly Revenue"
-          value={data && data.yearlySalesTotal}
+          value={data && data.summary.collections.this_year}
           increase="+43%"
           description="Since last month"
           icon={
