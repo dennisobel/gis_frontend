@@ -3,7 +3,6 @@ import {
   TextField,
   Card,
   Button,
-  FormControl,
   InputLabel,
   Select,
   MenuItem,
@@ -14,7 +13,6 @@ import { useDispatch } from "react-redux";
 import { setSignup } from "state"
 import counties from "state/counties";
 import { registerUser } from '../../helper/helper'
-import axios from "axios";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -28,7 +26,6 @@ const SignUpForm = () => {
     password: "",
     role: "",
     user_type: "",
-    kra_brs_number: "",
     ministry: "",
     county_id: ""
   });
@@ -41,7 +38,6 @@ const SignUpForm = () => {
     password: false,
     role: false,
     user_type: false,
-    kra_brs_number: false,
     ministry: false,
     county_id: false
   });
@@ -138,19 +134,6 @@ const SignUpForm = () => {
           required
           fullWidth
           margin="normal"
-          name="id_number"
-          type="text"
-          value={formValues.id_number}
-          onChange={handleChange}
-          error={formErrors.id_number}
-          helperText={formErrors.id_number && "Please enter a valid ID number"}
-        />
-        <InputLabel id="select-label">KRA Number</InputLabel>
-        <TextField
-          size="small"
-          required
-          fullWidth
-          margin="normal"
           name="kra_brs_number"
           type="text"
           value={formValues.kra_brs_number}
@@ -201,7 +184,7 @@ const SignUpForm = () => {
           value={formValues.password}
           onChange={handleChange}
           error={formErrors.password}
-          helperText={formErrors.kra && "Please enter your password"}
+          helperText={formErrors.password && "Please enter your password"}
         />
 
         <InputLabel id="select-label">Select a Role</InputLabel>

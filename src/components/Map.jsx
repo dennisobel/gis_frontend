@@ -5,19 +5,15 @@ import { useSelector } from 'react-redux';
 import Dot from './Dot';
 import PopupDetails from './PopupDetails';
 import MapboxDirections from '@mapbox/mapbox-sdk/services/directions'
-import polyline from '@mapbox/polyline';
-import * as turf from '@turf/turf'
 import { getAllBuildingStores } from 'helper/helper';
 
 const MapView = ({ markers }) => {
-    // const buildings = useSelector(state => state.global.buildings)
     const buildings = useSelector(state => state.global.countybuildings)
     const [userLocation, setUserLocation] = useState(null);
     const mapType = useSelector(state => state.global.mapType)
     const MapMarker = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9c0 6 7 13 7 13s7-7 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /%3E%3C/svg%3E'
     const selectedMarkerRef = useRef();
     const [selectedMarker, setSelectedMarker] = useState();
-    const [isVisible,setIsVisible] = useState()
     const [directions, setDirections] = useState(null);
     const [viewport, setViewport] = useState();
     const MAPBOX_TOKEN = 'pk.eyJ1Ijoid2VzbGV5MjU0IiwiYSI6ImNsMzY2dnA0MDAzem0zZG8wZTFzc3B3eG8ifQ.EVg7Sg3_wpa_QO6EJjj9-g'
@@ -26,6 +22,8 @@ const MapView = ({ markers }) => {
     const directionsClient = MapboxDirections({
         accessToken: MAPBOX_TOKEN,
     });
+
+
 
     function calculateMapCenter(objects) {
         let totalLatitude = 0;
@@ -59,20 +57,7 @@ const MapView = ({ markers }) => {
         })
     },[buildings])
 
-    // useEffect(()=>{
-    //     viewport.contains()
-    // },[viewport])
 
-    useEffect(() => {
-        if (userLocation) {
-            // setViewport((prevState) => ({
-            //     ...prevState,
-            //     latitude: userLocation.latitude,
-            //     longitude: userLocation.longitude,
-            //     zoom: 12,
-            // }));
-        }
-    }, [userLocation]);
 
     useEffect(() => {
         getUserLocation();
@@ -95,27 +80,12 @@ const MapView = ({ markers }) => {
     };
 
     const handleSelected = async (marker) => {
-        // console.log("marker:",marker)
+        const viewport = mapRef.current.getMap().getViewport();
+        // Access the viewport properties (latitude, longitude, zoom, etc.)
+        console.log(viewport);
         getAllBuildingStores({_id:marker._id}).then(({data})=>{
-            // console.log("res:",data)
             setSelectedMarker(data)
         })
-
-
-        // setSelectedMarker((prevMarker) => prevMarker === marker ? null : marker);
-        // const origin = [userLocation.longitude, userLocation.latitude];
-        // const destination = [marker?.longitude, marker?.latitude];
-        // const response = await directionsClient.getDirections({
-        //     profile: 'driving',
-        //     waypoints: [
-        //         { coordinates: origin },
-        //         { coordinates: destination }
-        //     ],
-        //     steps: true,
-        // }).send();
-        // const coordinates = polyline.decode(response.body.routes[0].geometry)
-        // const line = turf.lineString(coordinates);
-        // setDirections(line)
     };
 
     const handleClosePopup = () => {
@@ -128,7 +98,6 @@ const MapView = ({ markers }) => {
           const popupContainer = mapRef.current && mapRef.current.querySelector('.mapboxgl-popup');
     
           if (popupContainer && !popupContainer.contains(target)) {
-            // Click occurred outside of Popup, close it
             handleClosePopup();
           }
         };
@@ -204,6 +173,7 @@ const MapView = ({ markers }) => {
 
     return (
         <Map
+            ref={mapRef}
             key={mapKey}
             initialViewState={{ ...viewport }}
             onViewportChange={handleViewportChange}
